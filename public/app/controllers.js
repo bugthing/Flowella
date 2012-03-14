@@ -41,3 +41,17 @@ Flowella.chartsController = Ember.ArrayController.create({
     }
 });
 
+Flowella.chartSectionsController = Ember.ArrayController.create({
+});
+Flowella.chartEdgesController = Ember.ArrayController.create({
+});
+
+// Non-array controllers
+
+Flowella.chartController = Ember.Object.create({
+    chart: Ember.required(),
+});
+Flowella.chartController.addObserver('chart', function(){
+    Flowella.chartModel = this.get('chart');
+})
+

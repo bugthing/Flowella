@@ -2,6 +2,7 @@
 <!-- Flowella - JS Application code -->
 
 var Flowella = Ember.Application.create({
+
     ready: function() {
 
         // load the tools
@@ -10,8 +11,8 @@ var Flowella = Ember.Application.create({
         // load the charts..
         Flowella.chartsController.load();
 
-        // create the charts view and add to page.
-        Flowella.chartsView = Flowella.ChartsView.create({}).appendTo('#sidebar');
-
+        // create the list charts view and add to page.
+        Flowella.chartsView = Flowella.ChartsView.create({});
+        Flowella.chartsView.appendTo('#sidebar');
     },
 });

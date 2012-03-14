@@ -58,29 +58,31 @@
     {{/each}}   
 </script>
 
-<script type="text/x-handlebars" data-template-name="show-chart">
-
+<script type="text/x-handlebars" data-template-name="list-tools">
     <div id="toolsvisual">
-        {{#view Flowella.ToolsView }}
-          {{#each tools}}
-              {{#view Flowella.ToolListItemView toolBinding="this" }}
-                  <div class="ui-widget-content btn charttool" id="{{tool.ref}}">{{tool.name}}</div>
-              {{/view}}   
-          {{/each}}   
-        {{/view}}   
+        {{#each tools}}
+            {{#view Flowella.ToolListItemView toolBinding="this" }}
+                <div class="ui-widget-content btn charttool" id="{{tool.ref}}">{{tool.name}}</div>
+            {{/view}}   
+        {{/each}}   
     </div>
+</script>
 
-    <div id="chartvisual">
-      Chart: {{chart.name}}
-      {{#each chart.sections}}
-        {{#view sectionBinding="this" }}
-          {{#with section}}
-            <div class="sectionnode" {{bindAttr id="divId"}}>{{name}}</div>
-          {{/with}}   
-        {{/view}}   
+<script type="text/x-handlebars" data-template-name="show-chart">
+    <div id="chartvisual"> Chart: {{chart.name}} </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="list-chartsections">
+      {{#each sections}}
+        {{view Flowella.ChartSectionView sectionBinding="this"}}
       {{/each}}   
     </div>
+</script>
 
+<script type="text/x-handlebars" data-template-name="show-chartsection">
+    <div class="sectionnode" {{bindAttr id="id"}} {{bindAttr style="divStyle"}} > 
+        {{name}}
+    </div>
 </script>
 
   </head>

@@ -4,6 +4,7 @@
 // Tools - 
 
 Flowella.ToolsView = Ember.View.extend({ 
+    templateName: 'list-tools',
     toolsBinding: 'Flowella.toolsController',
 });
 
@@ -26,24 +27,49 @@ Flowella.ChartListItemView = Ember.View.extend({
         // when charts are a list item, is likely they only have name and id,
         // so lets call findResource to make an ajax call to populate it
         var chart = this.get('chart');
-        chart.get()
-        .done(function(){
-            if ( Flowella.chartView == undefined ) {
-                Flowella.chartView = Flowella.ChartView.create({});
+        chart.getREST().done(function(){
+            Flowella.chartController.set('chart', chart);
+            if ( typeof(Flowella.chartContainerView) == 'undefined' ) {
+                Flowella.chartContainerView = Flowella.ChartContainerView.create();
+                Flowella.chartContainerView.appendTo('#mainarea');
             }
-            Flowella.chartView.remove();
-            Flowella.chartView.set('chart', chart );
-            Flowella.chartView.appendTo('#mainarea');
         });
-    }
+    },
 });
 
 Flowella.ChartView = Ember.View.extend({
     templateName: 'show-chart',
-    chart: Ember.required(),
+    chartBinding: 'Flowella.chartModel',
+});
+
+Flowella.ChartSectionsView = Ember.View.extend({
+    templateName: 'list-chartsections',
+    sectionsBinding: 'Flowella.chartSectionsController',
+});
+
+Flowella.ChartSectionView = Ember.View.extend({
+    templateName: 'show-chartsection',
+    section: Ember.required(),
+    name: function() {
+        return this.get('section').name;
+    }.property('section'),
+
+    id: function() {
+        return 'section_' + this.get('section').id;
+    }.property('section'),
+
+    divStyle: function() {
+        return 'position:absolute;' 
+        + 'left:' + this.get('section').pos_left + 'px;'
+        + 'top:'  + this.get('section').pos_top  + 'px;' 
+    }.property('section'),
+});
+
+Flowella.ChartEdgesView = Ember.View.extend({
+    edgesBinding: 'Flowella.chartEdgesController',
     didInsertElement: function() {
 
-        var edges = this.chart.edges;
+        var edges = this.get('edges').content;
 
         jsPlumb.Defaults.Connector = [ "Flowchart" ];
         jsPlumb.makeTarget(
@@ -70,6 +96,11 @@ Flowella.ChartView = Ember.View.extend({
                 [ "Arrow", { location:0.5 } ],
                 [ "Label", { location:0.8, label: edge.label, cssClass: "edge-label" } ]
             ];
+
+            if ( ! jQuery('#section_' + edge.fromSectionId).length ) {
+                alert('cannot find:' + edge.fromSectionId + '. Is it in the DOM?');
+                break;
+            }
 
             var source_ep = jsPlumb.addEndpoint(
                 'section_' + edge.fromSectionId,
@@ -103,6 +134,14 @@ Flowella.ChartView = Ember.View.extend({
 
         // make all .window divs draggable
         jsPlumb.draggable(jsPlumb.getSelector(".sectionnode"));
-
-    },
+    }
 });
+
+Flowella.ChartContainerView = Ember.ContainerView.extend({
+    childViews: ['toolsView','chartView', 'sectionsView', 'edgesView'],
+    toolsView: Flowella.ToolsView,
+    chartView: Flowella.ChartView,
+    sectionsView: Flowella.ChartSectionsView,
+    edgesView: Flowella.ChartEdgesView,
+});
+

@@ -4,7 +4,7 @@
 // REST Base Model
 Flowella.RESTModel = Ember.Object.extend({
     resourceUrl:  Ember.required(),
-    get: function() {
+    getREST: function() {
         var self = this;
         return jQuery.ajax({
           url: this._resourceUrl(),
@@ -54,6 +54,9 @@ Flowella.ChartModel = Flowella.RESTModel.extend({
         }
         this.set('sections', sections );
 
+        // set the content on the controller array 
+        Flowella.chartSectionsController.set('content', sections);
+
         // build array of edge objects..
         var edges = new Array();
         for( var i=0; i < json.edges.length; i++ ) {
@@ -67,6 +70,9 @@ Flowella.ChartModel = Flowella.RESTModel.extend({
         }
         this.set('edges', edges );
 
+        // set the content on the controller array 
+        Flowella.chartEdgesController.set('content', edges);
+
         Ember.endPropertyChanges(this);
         return this;
     }
@@ -77,9 +83,6 @@ Flowella.SectionModel = Ember.Object.extend({
     name: '',
     pos_left: 0,
     pos_top: 0,
-    divId: function() {
-        return 'section_' + this.get('id'); 
-    }.property('id')
 });
 
 Flowella.SectionRESTModel = Flowella.RESTModel.extend({
