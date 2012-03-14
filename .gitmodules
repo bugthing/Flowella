@@ -1,0 +1,6 @@
+[submodule "submodules/bootstrap"]
+	path = submodules/bootstrap
+	url = git://github.com/twitter/bootstrap.git
+[submodule "submodules/ember.js"]
+	path = submodules/ember.js
+	url = git://github.com/emberjs/ember.js.git

@@ -1,0 +1,16 @@
+
+
+
+##############################################################################
+# Dev Notes 
+##############################################################################
+ 
+ Project was started like this:
+   wget http://gist.github.com/raw/2127281/boil.sh
+   chmod u+x ./boil.sh
+   ./boil.sh Flowella
+   cd Flowella
+
+ Imported into the git repo like this:
+   git remote add origin git@github.com:bugthing/Flowella.git 
+
