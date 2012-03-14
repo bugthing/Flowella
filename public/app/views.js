@@ -59,37 +59,50 @@ Flowella.ChartSectionView = Ember.View.extend({
         + 'top:'  + this.get('section').pos_top  + 'px;' 
     }.property('section'),
     didInsertElement: function() {
-        this.$().draggable({helper: 'clone'});
+
+        var controllerID = this.get('section').id;
 
         // link the section div to context menu..
-        this.$().contextMenu('sectionMenu', {
+        this.$().contextMenu(
+            'sectionMenu',
+            { 
+            shadow: true,
             bindings: {
                 'edit': function(t) {
+                    Flowella.chartSectionController.editSection( controllerID )
                     //var secID = parse_section_id( t.id );
                     //build_section_edit_area( secID );
                 },
                 'delete': function(t) {
+                    controller.menuDelete();
                     //var secID = parse_section_id( t.id );
                     //del_section( secID );
                 },
                 'onwardsection': function(t) {
+                    controller.menuOnwardSection();
                     //var secID = parse_section_id( t.id );
                     //dialog_for_onward_section( secID );
                 },
                 'newsection': function(t) {
+                    controller.menuNewSection();
                     //add_section();
                 }
             }
-        });
+           }
+       );
     },
-    gogo: function(event) {
-        alert('hello');
-    }
 });
 
 Flowella.ChartEdgesView = Ember.View.extend({
     edgesBinding: 'Flowella.chartEdgesController',
+    drawCount: 0,
     didInsertElement: function() {
+        this.drawEdges();
+    },
+    reDrawEdges: function(){
+        this.rerender();
+    }.observes('edges.content'),
+    drawEdges: function() {
 
         var edges = this.get('edges').content;
 
@@ -156,12 +169,19 @@ Flowella.ChartEdgesView = Ember.View.extend({
 
         // make all .window divs draggable
         jsPlumb.draggable(jsPlumb.getSelector(".sectionnode"));
-    }
+    },
 });
 
 Flowella.ChartSectionMenuView = Ember.View.extend({
     templateName: 'show-chartsectionmenu',
 });
+
+Flowella.SectionLinesView = Ember.View.extend({
+    templateName: 'show-sectionlines',
+    section_linesBinding: 'Flowella.chartSectionLinesController',
+});
+
+// Container views..
 
 Flowella.ChartContainerView = Ember.ContainerView.extend({
     childViews: ['toolsView','chartView', 'sectionMenu','sectionsView', 'edgesView'],
@@ -171,4 +191,3 @@ Flowella.ChartContainerView = Ember.ContainerView.extend({
     edgesView: Flowella.ChartEdgesView,
     sectionMenu: Flowella.ChartSectionMenuView,
 });
-

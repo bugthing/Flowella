@@ -43,7 +43,11 @@ Flowella.chartsController = Ember.ArrayController.create({
 
 Flowella.chartSectionsController = Ember.ArrayController.create({
 });
+
 Flowella.chartEdgesController = Ember.ArrayController.create({
+});
+
+Flowella.chartSectionLinesController = Ember.ArrayController.create({
 });
 
 // Non-array controllers
@@ -56,12 +60,70 @@ Flowella.chartController = Ember.Object.create({
 });
 Flowella.chartController.addObserver('chart', function(){
     var chart = this.get('chart');
-    Flowella.chartSectionsController.set('content', chart.get('sections'));
-    Flowella.chartEdgesController.set('content', chart.get('edges'));
+
+    // build array thisof section objects..
+    var sections = new Array();
+    for( var i=0; i < chart.sections.length; i++ ) {
+        sections.push(
+            Flowella.SectionModel.create({
+                id: chart.sections[i].id,
+                name: chart.sections[i].name,
+                pos_left: chart.sections[i].pos_left,
+                pos_top: chart.sections[i].pos_top
+            })
+        );
+    }
+    Flowella.chartSectionsController.set('content', sections );
+
+    // build array of edge objects..
+    var edges = new Array();
+    for( var i=0; i < chart.edges.length; i++ ) {
+        edges.push(
+            Flowella.EdgeModel.create({
+                fromSectionId: chart.edges[i][0],
+                toSectionId: chart.edges[i][1],
+                label: chart.edges[i][2].label
+            })
+        );
+    }
+    Flowella.chartEdgesController.set('content', edges);
+
     if ( typeof(Flowella.chartContainerView) == 'undefined' ) {
         Flowella.chartContainerView = Flowella.ChartContainerView.create();
+        Flowella.chartContainerView.replaceIn('#mainarea');
     }
-    Flowella.chartContainerView.replaceIn('#mainarea');
 
-})
+});
 
+Flowella.chartSectionController = Ember.Object.create({
+    section: Ember.required(),
+    editSection: function( id ) {
+        var section = Flowella.SectionModel.create({'id': id});
+        section.getREST().success( function(){
+            alert( 'edit:' + section.id );
+            Flowella.chartSectionController.set('section', section);
+        });
+    },
+    menuEdit: function() {
+        var section = Flowella.chartSectionController.get('section');
+        section.getREST().success( function(json) {
+
+            // build array of edge objects..
+            var section_lines = new Array();
+            for( var i=0; i < section.section_lines.length; i++ ) {
+                section_lines.push(
+                     Flowella.SectionlineModel.create({
+                        id: section.section_lines[i].id,
+                        tool_ref: section.section_lines[i].tool_ref,
+                        weight: section.section_lines[i].weight
+                    })
+                );
+            }
+        
+            Flowella.chartSectionLinesController.set('content', section_lines );
+        });
+    },
+    menuDelete: function() {
+        alert('menu DELETE link click and caught in controller');
+    }
+});

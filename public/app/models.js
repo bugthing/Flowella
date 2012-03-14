@@ -16,14 +16,12 @@ Flowella.RESTModel = Ember.Object.extend({
         });
     },
     deserialize: function( json ) {
-        if( typeof(this.resourceProperties ) == 'Array' ) {
-            for( var i=0; i < this.resourceProperties.length; i++ ) {
-                var fname = this.resourceProperties[i];
-                if ( typeof(json[fname]) !== 'undefined' ) {
-                    this.set(fname, json[fname]);
-                }
-            }
-        }
+       for( var i=0; i < this.resourceProperties.length; i++ ) {
+           var fname = this.resourceProperties[i];
+           if ( typeof(json[fname]) !== 'undefined' ) {
+               this.set(fname, json[fname]);
+           }
+       }
     },
     _resourceUrl: function() {
         var this_id = this.id;
@@ -35,59 +33,17 @@ Flowella.RESTModel = Ember.Object.extend({
 
 Flowella.ChartModel = Flowella.RESTModel.extend({
     resourceUrl:  '/rest/build/chart',
-    deserialize: function(json) {
-        Ember.beginPropertyChanges(this);
-
-        this.set('id',   json.id );
-        this.set('name', json.name );
-    
-        // build array of section objects..
-        var sections = new Array();
-        for( var i=0; i < json.sections.length; i++ ) {
-            sections.push(
-                Flowella.SectionModel.create({
-                    id: json.sections[i].id,
-                    name: json.sections[i].name,
-                    pos_left: json.sections[i].pos_left,
-                    pos_top: json.sections[i].pos_top
-                })
-            );
-        }
-        this.set('sections', sections );
-
-        // build array of edge objects..
-        var edges = new Array();
-        for( var i=0; i < json.edges.length; i++ ) {
-            edges.push(
-                Flowella.EdgeModel.create({
-                    fromSectionId: json.edges[i][0],
-                    toSectionId: json.edges[i][1],
-                    label: json.edges[i][2].label
-                })
-            );
-        }
-        this.set('edges', edges );
-
-        Ember.endPropertyChanges(this);
-        return this;
-    }
+    resourceProperties: ['name', 'sections', 'edges'],
 });
 
-Flowella.SectionModel = Ember.Object.extend({
-    id: Ember.required(),
-    name: '',
-    pos_left: 0,
-    pos_top: 0,
-});
-
-Flowella.SectionRESTModel = Flowella.RESTModel.extend({
+Flowella.SectionModel = Flowella.RESTModel.extend({
     resourceUrl:  '/rest/build/section',
-    resourceProperties: ['name','pos_left','pos_top'],
+    resourceProperties: ['name','pos_left','pos_top','display_html','section_lines'],
 });
 
-Flowella.SectionlineRESTModel = Flowella.RESTModel.extend({
+Flowella.SectionlineModel = Flowella.RESTModel.extend({
     resourceUrl:  '/rest/build/section_line',
-    resourceProperties: ['name','pos_left','pos_top'],
+    resourceProperties: ['section_id','edit_html'],
 });
 
 // Simple Models

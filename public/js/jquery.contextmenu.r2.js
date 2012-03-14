@@ -104,8 +104,8 @@
     menu.html(content);
 
     // if there's an onShowMenu, run it now -- must run after content has been added
-		// if you try to alter the content variable before the menu.html(), IE6 has issues
-		// updating the content
+	// if you try to alter the content variable before the menu.html(), IE6 has issues
+	// updating the content
     if (!!cur.onShowMenu) menu = cur.onShowMenu(e, menu);
 
     $.each(cur.bindings, function(id, func) {

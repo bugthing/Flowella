@@ -76,7 +76,6 @@
       {{#each sections}}
         {{view Flowella.ChartSectionView sectionBinding="this"}}
       {{/each}}   
-    </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-chartsection">
@@ -118,6 +117,15 @@
       </ul>
     </div>
 </script>
+
+<script type="text/x-handlebars" data-template-name="show-sectionlines">
+    {{#each section_lines}}
+        <div>
+            {{tool_ref}}
+        </div>
+    {{/each}}
+</script>
+
 
   </head>
 
