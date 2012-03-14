@@ -58,6 +58,33 @@ Flowella.ChartSectionView = Ember.View.extend({
         + 'left:' + this.get('section').pos_left + 'px;'
         + 'top:'  + this.get('section').pos_top  + 'px;' 
     }.property('section'),
+    didInsertElement: function() {
+        this.$().draggable({helper: 'clone'});
+
+        // link the section div to context menu..
+        this.$().contextMenu('sectionMenu', {
+            bindings: {
+                'edit': function(t) {
+                    //var secID = parse_section_id( t.id );
+                    //build_section_edit_area( secID );
+                },
+                'delete': function(t) {
+                    //var secID = parse_section_id( t.id );
+                    //del_section( secID );
+                },
+                'onwardsection': function(t) {
+                    //var secID = parse_section_id( t.id );
+                    //dialog_for_onward_section( secID );
+                },
+                'newsection': function(t) {
+                    //add_section();
+                }
+            }
+        });
+    },
+    gogo: function(event) {
+        alert('hello');
+    }
 });
 
 Flowella.ChartEdgesView = Ember.View.extend({
@@ -132,11 +159,16 @@ Flowella.ChartEdgesView = Ember.View.extend({
     }
 });
 
+Flowella.ChartSectionMenuView = Ember.View.extend({
+    templateName: 'show-chartsectionmenu',
+});
+
 Flowella.ChartContainerView = Ember.ContainerView.extend({
-    childViews: ['toolsView','chartView', 'sectionsView', 'edgesView'],
+    childViews: ['toolsView','chartView', 'sectionMenu','sectionsView', 'edgesView'],
     toolsView: Flowella.ToolsView,
     chartView: Flowella.ChartView,
     sectionsView: Flowella.ChartSectionsView,
     edgesView: Flowella.ChartEdgesView,
+    sectionMenu: Flowella.ChartSectionMenuView,
 });
 
