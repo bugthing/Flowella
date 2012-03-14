@@ -50,8 +50,18 @@ Flowella.chartEdgesController = Ember.ArrayController.create({
 
 Flowella.chartController = Ember.Object.create({
     chart: Ember.required(),
+    title: function() {
+        return this.get('chart').name;
+    }.property('chart')
 });
 Flowella.chartController.addObserver('chart', function(){
-    Flowella.chartModel = this.get('chart');
+    var chart = this.get('chart');
+    Flowella.chartSectionsController.set('content', chart.get('sections'));
+    Flowella.chartEdgesController.set('content', chart.get('edges'));
+    if ( typeof(Flowella.chartContainerView) == 'undefined' ) {
+        Flowella.chartContainerView = Flowella.ChartContainerView.create();
+    }
+    Flowella.chartContainerView.replaceIn('#mainarea');
+
 })
 

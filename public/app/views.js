@@ -29,17 +29,13 @@ Flowella.ChartListItemView = Ember.View.extend({
         var chart = this.get('chart');
         chart.getREST().done(function(){
             Flowella.chartController.set('chart', chart);
-            if ( typeof(Flowella.chartContainerView) == 'undefined' ) {
-                Flowella.chartContainerView = Flowella.ChartContainerView.create();
-                Flowella.chartContainerView.appendTo('#mainarea');
-            }
         });
     },
 });
 
 Flowella.ChartView = Ember.View.extend({
     templateName: 'show-chart',
-    chartBinding: 'Flowella.chartModel',
+    chartBinding: 'Flowella.chartController',
 });
 
 Flowella.ChartSectionsView = Ember.View.extend({
@@ -57,7 +53,6 @@ Flowella.ChartSectionView = Ember.View.extend({
     id: function() {
         return 'section_' + this.get('section').id;
     }.property('section'),
-
     divStyle: function() {
         return 'position:absolute;' 
         + 'left:' + this.get('section').pos_left + 'px;'

@@ -69,7 +69,7 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-chart">
-    <div id="chartvisual"> Chart: {{chart.name}} </div>
+    <div id="chartvisual"> Chart: {{chart.title}} </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="list-chartsections">
