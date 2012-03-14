@@ -48,6 +48,17 @@ Flowella.chartEdgesController = Ember.ArrayController.create({
 });
 
 Flowella.chartSectionLinesController = Ember.ArrayController.create({
+    buildSectionLineEdits: function() {
+        this.get('content').forEach(function(secLine) {
+            secLine.getREST().success( function(){
+                console.log('controller:' + secLine);
+                Flowella.editSectionLineView = Flowella.EditSectionLineView.create({
+                    'section_line' : secLine
+                });
+                Flowella.editSectionLineView.appendTo('#section_editarea');
+            });
+        });
+    }.observes('content')
 });
 
 // Non-array controllers
@@ -58,10 +69,11 @@ Flowella.chartController = Ember.Object.create({
         return this.get('chart').name;
     }.property('chart')
 });
+
 Flowella.chartController.addObserver('chart', function(){
     var chart = this.get('chart');
 
-    // build array thisof section objects..
+    // build array of section objects..
     var sections = new Array();
     for( var i=0; i < chart.sections.length; i++ ) {
         sections.push(
@@ -88,6 +100,7 @@ Flowella.chartController.addObserver('chart', function(){
     }
     Flowella.chartEdgesController.set('content', edges);
 
+    // show view?
     if ( typeof(Flowella.chartContainerView) == 'undefined' ) {
         Flowella.chartContainerView = Flowella.ChartContainerView.create();
         Flowella.chartContainerView.replaceIn('#mainarea');
@@ -103,19 +116,23 @@ Flowella.chartSectionController = Ember.Object.create({
 
             Flowella.chartSectionController.set('section', section);
 
-            // build array of sectioneline objects..
-            var section_lines = new Array();
+            // add to SectionLines controller array 
+            var sectionLines = new Array();
             for( var i=0; i < section.section_lines.length; i++ ) {
                 var sl =  Flowella.SectionlineModel.create({
                     id: section.section_lines[i].id,
                     tool_ref: section.section_lines[i].tool_ref,
                     weight: section.section_lines[i].weight
                 });
-                sl.getREST();
-                section_lines.push( sl );
+                sectionLines.push(sl);
             }
+            Flowella.chartSectionLinesController.set('content', sectionLines);
         
-            Flowella.chartSectionLinesController.set('content', section_lines );
+            // show the view..
+            if ( typeof(Flowella.sectionLinesView) == 'undefined' ) {
+                Flowella.editSectionView = Flowella.EditSectionView.create();
+                Flowella.editSectionView.replaceIn('#sidebar');
+            }
         });
     },
     menuDelete: function() {

@@ -118,10 +118,20 @@
     </div>
 </script>
 
-<script type="text/x-handlebars" data-template-name="show-sectionlines">
-    {{#each section_lines}}
-        {{tool_ref}}
-    {{/each}}
+
+<script type="text/x-handlebars" data-template-name="show-sectionedit">
+    <div>
+        <div>Section: {{section.section.name}}</div>
+        <div id="section_editarea">
+        </div>
+        <div>
+            <a href='' class='btn'> SAVE </a>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-editsectionline">
+    {{ section_line_edit editSrc }}
 </script>
 
 

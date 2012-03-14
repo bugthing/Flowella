@@ -176,9 +176,18 @@ Flowella.ChartSectionMenuView = Ember.View.extend({
     templateName: 'show-chartsectionmenu',
 });
 
-Flowella.SectionLinesView = Ember.View.extend({
-    templateName: 'show-sectionlines',
+Flowella.EditSectionView = Ember.View.extend({
+    templateName: 'show-sectionedit',
     section_linesBinding: 'Flowella.chartSectionLinesController',
+    sectionBinding: 'Flowella.chartSectionController',
+});
+
+Flowella.EditSectionLineView = Ember.View.extend({
+    templateName: 'show-editsectionline',
+    section_line: Ember.required(),
+    editSrc: function() {
+        return this.get('section_line').edit_html;
+    }.property('section_line'),
 });
 
 // Container views..
@@ -193,9 +202,9 @@ Flowella.ChartContainerView = Ember.ContainerView.extend({
 });
 
 
-// HandleBars - section edit helper
-Handlebars.registerHelper('section_edit', function(property) {
+// HandleBars - section edit helper (crap way of html escaping)
+
+Handlebars.registerHelper('section_line_edit', function(property) {
   var value = Ember.getPath(this, property);
-  var str = '<span class="highlight">'+value+'</span>';
-  return new Handlebars.SafeString( str );
+  return new Handlebars.SafeString( value );
 });
