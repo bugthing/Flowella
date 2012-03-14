@@ -1,0 +1,66 @@
+[% BLOCK inline_css %]
+
+/* chart visual */
+
+.sectionnode {
+    border:1px solid #346789;
+    z-index:20;
+    position:absolute;
+    padding: 8px;
+    font-size: 15px;
+}
+
+#toolsvisual {
+    width: 100%;
+    min-height: 40px;
+}
+#toolsvisual div {
+    float: left;
+}
+
+/* newSectionDialog */
+
+#onwardsectionmodal {
+    display:none;
+}
+
+/*  jsPlumb related */
+
+._jsPlumb_connector {
+    z-index:4;
+}
+._jsPlumb_endpoint {
+    z-index:5;
+}
+._jsPlumb_overlay {
+    z-index:6;
+}
+.edge-label {
+    background-color:white;
+    padding: 1px;
+    font:12px sans-serif;
+    color: #346789;
+    z-index:21;
+    border:1px dotted gray;
+    opacity:0.8;
+    filter:alpha(opacity=80);
+}
+
+[% END %] 
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span10" id='mainarea'>
+            <!-- mainarea content-->
+            <h1>Welcome</h1>
+            <p>Feel free to click about and see what possible</p>
+        </div>
+        <div class="span2" id='sidebar'>
+            <!-- sidebar content -->
+        </div>
+    </div>
+</div>
+
+
+
+

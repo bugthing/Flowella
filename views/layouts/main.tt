@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+[%
+    menu = {
+        'Home'   => '/',
+        'Charts' => '/charts',
+    };
+    menu_hilight = menu.keys.first;
+    IF template.menu_hilight;
+      menu_hilight = template.menu_hilight;
+    END;
+-%]
+  <head>
+    <meta charset="utf-8">
+    <title> Flowella </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- css styles -->
+
+    <link href="./css/bootstrap/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="./css/bootstrap/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    [% TRY %]
+        [% INCLUDE css_incs %]
+    [% CATCH %]
+        <!-- css incs - none -->
+    [% END %]
+
+    <!-- CSS inline -->
+    <style>
+    [% TRY %]
+        [% INCLUDE inline_css %]
+    [% CATCH %]
+        <!-- css inline - none -->
+    [% END %]
+    </style>
+
+<!-- EmberJS - view handlebar templates -->
+<script type="text/x-handlebars" data-template-name="list-charts">
+    {{#each charts}}
+      {{#view Flowella.ChartListItemView chartBinding="this" }}
+          {{#with chart}}
+            <a href='#'>{{name}}</a>
+          {{/with}}   
+      {{/view}}   
+    {{/each}}   
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-chart">
+
+    <div id="toolsvisual">
+        {{#view Flowella.ToolsView }}
+          {{#each tools}}
+              {{#view Flowella.ToolListItemView toolBinding="this" }}
+                  <div class="ui-widget-content btn charttool" id="{{tool.ref}}">{{tool.name}}</div>
+              {{/view}}   
+          {{/each}}   
+        {{/view}}   
+    </div>
+
+    <div id="chartvisual">
+      Chart: {{chart.name}}
+      {{#each chart.sections}}
+        {{#view sectionBinding="this" }}
+          {{#with section}}
+            <div class="sectionnode" {{bindAttr id="divId"}}>{{name}}</div>
+          {{/with}}   
+        {{/view}}   
+      {{/each}}   
+    </div>
+
+</script>
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Flowella - Process Engine</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+                [% FOREACH mk IN menu.keys %]
+                    <li [% IF mk == menu_hilight %] class="active" [% END %]><a href="[% menu.$mk %]">[% mk %]</a></li> 
+                [% END %]
+            </ul>
+
+            [% IF user %]
+                <p class="navbar-text pull-right">Logged in as <a href="#">[% user %]</a></p>
+            [% END %]
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="container">
+      [% content %]
+    </div> <!-- /container -->
+
+    <!-- javascript -->
+    <script src="./js/jquery-1.7.1.js"></script>
+
+    <script src="./js/jquery-ui-1.8.18.custom.min.js"></script>
+    <script src="./js/jquery.jsPlumb-1.3.7-all.js"></script>
+
+    <script src="./js/emberjs/ember.js"></script>
+
+    <script src="./app/app.js"></script>
+    <script src="./app/models.js"></script>
+    <script src="./app/controllers.js"></script>
+    <script src="./app/views.js"></script>
+
+    <!-- additional JS libs -->
+    [% TRY %]
+        [% INCLUDE js_incs %]
+    [% CATCH %]
+        <!-- js inline - none -->
+    [% END %]
+
+    <!-- JS inline -->
+    <script>
+    [% TRY %]
+        [% INCLUDE inline_js %]
+    [% CATCH %]
+        <!-- js inline - none -->
+    [% END %]
+    </script>
+
+
+  </body>
+</html>

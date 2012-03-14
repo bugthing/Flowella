@@ -1,25 +1,22 @@
+Flowella - Process Engine
+=========================
 
-
-
-##############################################################################
-# Dev Notes 
-##############################################################################
+Development Notes:
+------------------
  
- Project was started like this:
-   wget http://gist.github.com/raw/2127281/boil.sh
-   chmod u+x ./boil.sh
-   ./boil.sh Flowella
-   cd Flowella
+Project was started like this:
+   -- wget http://gist.github.com/raw/2127281/boil.sh
+   -- chmod u+x ./boil.sh
+   -- ./boil.sh Flowella
+   -- cd Flowella
 
-##############################################################################
 Start the App:
+------------------
 
-    plackup --port 9090 bin/app.psgi
+* plackup --port 9090 bin/app.psgi
 
-##############################################################################
-
-##############################################################################
-Database related commands:
+Database Stuff:
+------------------
 
     # Flowella::Schema 
 
@@ -48,17 +45,13 @@ Database related commands:
         Flowella::Reader::DataTable::Schema \
         'dbi:SQLite:dbname=./etc/db/datatable.db' 
 
-##############################################################################
-
-##############################################################################
 Mass search and replace
+-----------------------
 
     find . -name "*.*" -print -type f | xargs sed -i 's/foo/bar/g'
 
-##############################################################################
-
-##############################################################################
 Use Interface:
+-----------------------
    
     CSS - Layout: 
         http://twitter.github.com/bootstrap/
@@ -71,11 +64,10 @@ Use Interface:
 
     Flow chart visualisation:
         http://jsplumb.org/
+        http://jsplumb.googlecode.com/files/jquery.jsPlumb-1.3.7-all.js
 
-##############################################################################
-
-##############################################################################
 Build and Deploy - 
+-----------------------
 
     Using: DotCloud (http://docs.dotcloud.com/)
         sudo aptitude install python-setuptools
@@ -89,5 +81,3 @@ Build and Deploy -
         dotcloud push flowella
         (you may need to update dotcloud.yml to point the build dir)
 
-
-##############################################################################
