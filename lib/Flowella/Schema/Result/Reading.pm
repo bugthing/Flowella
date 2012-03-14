@@ -1,0 +1,164 @@
+use utf8;
+package Flowella::Schema::Result::Reading;
+
+# Created by DBIx::Class::Schema::Loader
+# DO NOT MODIFY THE FIRST PART OF THIS FILE
+
+=head1 NAME
+
+Flowella::Schema::Result::Reading
+
+=cut
+
+use strict;
+use warnings;
+
+use base 'DBIx::Class::Core';
+
+=head1 COMPONENTS LOADED
+
+=over 4
+
+=item * L<DBIx::Class::InflateColumn::DateTime>
+
+=back
+
+=cut
+
+__PACKAGE__->load_components("InflateColumn::DateTime");
+
+=head1 TABLE: C<readings>
+
+=cut
+
+__PACKAGE__->table("readings");
+
+=head1 ACCESSORS
+
+=head2 id
+
+  data_type: 'integer'
+  is_auto_increment: 1
+  is_nullable: 0
+
+=head2 chart_id
+
+  data_type: 'integer'
+  is_foreign_key: 1
+  is_nullable: 0
+
+=head2 active_read_section_id
+
+  data_type: 'integer'
+  is_foreign_key: 1
+  is_nullable: 1
+
+=head2 added
+
+  data_type: 'timestamp'
+  default_value: current_timestamp
+  is_nullable: 0
+
+=head2 updated
+
+  data_type: 'timestamp'
+  default_value: current_timestamp
+  is_nullable: 0
+
+=cut
+
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
+  "chart_id",
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "active_read_section_id",
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
+  "added",
+  {
+    data_type     => "timestamp",
+    default_value => \"current_timestamp",
+    is_nullable   => 0,
+  },
+  "updated",
+  {
+    data_type     => "timestamp",
+    default_value => \"current_timestamp",
+    is_nullable   => 0,
+  },
+);
+
+=head1 PRIMARY KEY
+
+=over 4
+
+=item * L</id>
+
+=back
+
+=cut
+
+__PACKAGE__->set_primary_key("id");
+
+=head1 RELATIONS
+
+=head2 active_read_section
+
+Type: belongs_to
+
+Related object: L<Flowella::Schema::Result::ReadSection>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "active_read_section",
+  "Flowella::Schema::Result::ReadSection",
+  { id => "active_read_section_id" },
+  {
+    is_deferrable => 1,
+    join_type     => "LEFT",
+    on_delete     => "CASCADE",
+    on_update     => "CASCADE",
+  },
+);
+
+=head2 chart
+
+Type: belongs_to
+
+Related object: L<Flowella::Schema::Result::Chart>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "chart",
+  "Flowella::Schema::Result::Chart",
+  { id => "chart_id" },
+  { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
+);
+
+=head2 read_sections
+
+Type: has_many
+
+Related object: L<Flowella::Schema::Result::ReadSection>
+
+=cut
+
+__PACKAGE__->has_many(
+  "read_sections",
+  "Flowella::Schema::Result::ReadSection",
+  { "foreign.reading_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07011 @ 2011-12-23 04:47:33
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:aijU5yHn4+5nZ6cUPKjPuA
+
+# ABSTRACT: Flowchart creator, manager and runner.
+
+use Moose;
+with 'Flowella::Schema::Roles::Result::Reading';
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+1;

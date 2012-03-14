@@ -1,0 +1,108 @@
+
+use Modern::Perl;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+use Test::More;
+use FlowellaTest;
+
+ok( my $schema      = FlowellaTest::_get_schema() );
+
+$schema->txn_begin;
+
+# check the chart
+ok( my $chart = $schema->resultset('Chart')->create( { name => 'Schema Roles Test Chart' } ) );
+
+# test a default section is added when creating a chart..
+
+ok( my $section1 = $chart->sections->first );
+cmp_ok( $section1->name, 'eq', 'Section 1' );
+cmp_ok( $section1->weight, '==', 1 );
+
+# test defaults when creating sections.
+
+ok( my $section2 = $chart->sections->create({}) );
+cmp_ok( $section2->name, 'eq', 'Section 2' );
+cmp_ok( $section2->weight, '==', 2 );
+
+ok( my $section3 = $chart->sections->create({ name => 'Third Section' }) );
+cmp_ok( $section3->name, 'eq', 'Third Section' );
+cmp_ok( $section3->weight, '==', 3 );
+
+ok( my $section4 = $chart->sections->create({ weight => 2 }) );
+cmp_ok( $section4->name, 'eq', 'Section 4' );
+cmp_ok( $section4->weight, '==', 2 );
+
+# check we can get the starting section.
+ok( $chart->starting_section );
+cmp_ok( $chart->starting_section->name, 'eq', 'Section 1' );
+
+# create section lines linked to a tool
+
+ok( my $section_line1   = $section1->section_lines->create({ tool_ref => 'button_next' }) );
+ok( my $section_line2   = $section1->section_lines->create({ tool_ref => 'button_next' }) );
+
+# check the column inflation on params is working
+
+ok( my $json_data1 = { next_section => $section2->id } );
+ok( $section_line1->params( $json_data1 ) );
+ok( $section_line1->update );
+is_deeply( $json_data1,  $section_line1->params );
+
+ok( my $json_data2 = { next_section => $section3->id } );
+ok( $section_line2->params( $json_data2 ) );
+ok( $section_line2->update );
+is_deeply( $json_data2,  $section_line2->params );
+
+# check we can get an instanciated tool object from the section line
+
+ok( my $tool_obj = $section_line1->tool );
+isa_ok( ref $tool_obj, 'Flowella::Tool::ButtonNext' );
+isa_ok( $tool_obj->section_line, 'Flowella::Schema::Result::SectionLine' );
+
+# check we can get a section line's onward sections
+
+ok( my $onward_sections1 = $section_line1->onward_sections );
+ok( my $onward_sections2 = $section_line2->onward_sections );
+cmp_ok( $onward_sections1->count, '==', 1 );
+cmp_ok( $onward_sections2->count, '==', 1 );
+
+# check we can get a section's onward sections
+
+ok( my $onward_sections = $section1->onward_sections );
+cmp_ok( $onward_sections2->count, '==', 1 );
+
+# check we can get a section_line edit_html and edit_process
+
+ok( $section_line1->edit_html );
+ok( $section_line1->edit_process( $json_data1 ) );
+
+# check we can create a reading with a default section
+
+ok( my $reading_rs  = $schema->resultset('Reading') );
+ok( my $reading     = $reading_rs->create( { chart_id => $chart->id } ) );
+
+# .. check we have a stash on the reading, and it works..
+isa_ok( $reading->stash, 'HASH' );
+
+# check that creating a reading, gives us a default read_section set to the starting section
+
+ok( my $read_section = $reading->active_read_section );
+isa_ok( $read_section, 'Flowella::Schema::Result::ReadSection' );
+isa_ok( $read_section->section, 'Flowella::Schema::Result::Section' );
+cmp_ok( $read_section->section->id, '==', $section1->id );
+
+# check the column inflation on params for read_section is working
+
+ok( my $json_data3 = { '_' . $section_line1->id . '_next_section_button' => 1 } );
+ok( $read_section->params( $json_data3 ) );
+ok( $read_section->update );
+is_deeply( $json_data3,  $read_section->params );
+
+# check that when we delete a section it cascades (section_lines are deleted too)
+my $section_line_id_deleted = $section_line1->id;
+ok( $section1->delete );
+ok( ! $schema->resultset('SectionLine')->find( $section_line_id_deleted ) );
+
+$schema->txn_rollback;
+
+done_testing();

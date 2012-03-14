@@ -1,0 +1,113 @@
+package Flowella::Schema::Roles::Result::Chart;
+# ABSTRACT: Flowchart creator, manager and runner.
+
+use Moose::Role;
+
+=head1 NAME
+
+Flowella::Schema::Roles::Result::Chart - Role for corresponding class.
+
+=head1 CLASS ALTERATIONS
+
+SchemaLoader handles building the skelatal structure of the ResultSet for now,
+any changes to the column definitions can be calling the setup/configuration 
+methods again.
+
+=cut
+
+Flowella::Schema::Result::Chart->load_components( "TimeStamp" );
+Flowella::Schema::Result::Chart->add_columns(
+    "added",
+    {
+      data_type     => "timestamp", default_value => \"current_timestamp",
+      is_nullable   => 0, set_on_create => 1, set_on_update => 0 
+    },
+    "updated",
+    {
+      data_type     => "timestamp", default_value => \"current_timestamp",
+      is_nullable   => 0, set_on_create => 1, set_on_update => 1 
+    },
+);
+# add a default order by to the relationship.
+Flowella::Schema::Result::Chart->has_many(
+    "sections",
+    "Flowella::Schema::Result::Section",
+    { "foreign.chart_id" => "self.id" },
+    { 
+        cascade_copy      => 0, 
+        cascade_delete    => 0,
+        order_by          => { -asc => 'weight'},
+    },
+);
+
+=head1 MODIFIED METHODS
+
+=over
+
+=item insert
+
+Insure that newly created Charts have at least 1 Section
+We assume the Section gets created with default values.
+
+=cut
+
+around insert => sub {
+    my ($orig, $self) = (shift, shift);
+    my @args = @_;
+
+    my $guard = $self->result_source->schema->txn_scope_guard;
+    $self->$orig(@args);
+    $self->create_related ('sections', {} );
+    $guard->commit;
+
+    return $self;
+};
+
+=back
+
+=head1 METHODS
+
+=over
+
+=item starting_section
+
+Returns what should be the starting section for this Chart.
+
+=cut
+
+sub starting_section {
+    my $self = shift;
+    return $self->sections->search({}, { order_by => 'weight' } )->first;
+}
+
+=item edges
+
+Builds an ArrayRef of links between the Sections of this chart, entrys like so:
+ [
+  [ $from_section_id, $to_section_id, ($optional_extra_hash_of_data) ],
+  [ $from_section_id, $to_section_id, ($optional_extra_hash_of_data) ],
+ ]
+
+=cut
+
+sub edges {
+    my $self = shift;
+
+    my @edges;
+
+    # now add all onward sections to each section within the the above hash..
+    my $sections_rs = $self->sections;
+    while ( my $section = $sections_rs->next ) {
+        foreach ( @{ $section->onward_edges } ) {
+            push ( @edges, $_ );
+        }
+    }
+
+    return \@edges;
+}
+
+=back
+
+=cut
+
+1;

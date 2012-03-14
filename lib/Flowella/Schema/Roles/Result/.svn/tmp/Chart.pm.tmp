@@ -1,0 +1,75 @@
+package Flowella::Schema::Roles::Result::Chart;
+# ABSTRACT: Flowchart creator, manager and runner.
+
+use Moose::Role;
+
+=head1 NAME
+
+Flowella::Schema::Roles::Result::Chart - Role for corresponding class.
+
+=head1 CLASS ALTERATIONS
+
+SchemaLoader handles building the skelatal structure of the ResultSet for now,
+any changes to the column definitions can be calling the setup/configuration 
+methods again.
+
+=cut
+
+
+# add a default order by to the relationship.
+Flowella::Schema::Result::Chart->has_many(
+  "sections",
+  "Flowella::Schema::Result::Section",
+  { "foreign.chart_id" => "self.id" },
+  { 
+      cascade_copy      => 0, 
+      cascade_delete    => 0,
+      order_by          => { -asc => 'weight'},
+  },
+);
+
+=head1 MODIFIED METHODS
+
+=over
+
+=item insert
+
+Insure that newly created Charts have at least 1 Section
+We assume the Section gets created with default values.
+
+=cut
+
+around insert => sub {
+    my ($orig, $self) = (shift, shift);
+    my @args = @_;
+
+    my $guard = $self->result_source->schema->txn_scope_guard;
+    $self->$orig(@args);
+    $self->create_related ('sections', {} );
+    $guard->commit;
+
+    return $self;
+};
+
+=back
+
+=head1 METHODS
+
+=over
+
+=item starting_section
+
+Returns what should be the starting section for this Chart.
+
+=cut
+
+sub starting_section {
+    my $self = shift;
+    return $self->sections->search({}, { order_by => 'weight' } )->first;
+}
+
+=back
+
+=cut
+
+1;

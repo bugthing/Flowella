@@ -1,0 +1,32 @@
+package Flowella::Schema::Roles::Result::DataSource;
+use Moose::Role;
+
+=head1 NAME
+
+Flowella::Schema::Roles::Result::DataSource - Role for corresponding class.
+
+=head1 CLASS ALTERATIONS
+
+SchemaLoader handles building the skelatal structure of the ResultSet for now,
+any changes to the column definitions can be calling the setup/configuration 
+methods again.
+
+=cut
+
+Flowella::Schema::Result::DataSource->load_components(
+    'DynamicSubclass',
+);
+
+Flowella::Schema::Result::DataSource->typecast_map(
+    type => {
+        csv => 'Flowella::Schema::Result::DataSource::CSV',
+    }
+);
+
+=over
+
+=back
+
+=cut
+
+1;

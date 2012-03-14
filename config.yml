@@ -1,0 +1,29 @@
+log: "core"
+logger: "console"
+warnings: 1
+show_errors: 1
+
+template: template_toolkit
+engines:
+    template_toolkit:
+        WRAPPER: layouts/main.tt
+        start_tag: '[%'
+        stop_tag: '%]'
+
+plugins:
+  "Auth::Basic":
+    paths:
+      "/build":
+        realm: Process Building Area (under construction)
+        user: builder
+        password: sKlhd8967324jhejk9Dfsd
+#      "/rest":
+#        realm: Reader API
+#        user: reader
+#        password: readMePlease
+#
+
+flowella:
+  dsn: "dbi:SQLite:dbname=./etc/db/flowella.db"
+
+

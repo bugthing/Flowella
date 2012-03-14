@@ -1,0 +1,88 @@
+package Flowella::Tool::ButtonNext;
+# ABSTRACT: Flowchart creator, manager and runner.
+
+use Moose;
+
+extends 'Flowella::Tool';
+with 'Flowella::Tool::Roles::FormFuEdit';
+with 'Flowella::Tool::Roles::TemplateToolkitDisplay';
+
+around 'ref'    => sub { 'button_next' };
+around 'name'   => sub { 'Next Button' };
+
+around formfu_config => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    return {
+        elements => [
+            {  
+                type    => 'Text',
+                name    => 'button_label',
+                label   => 'Button Text:',
+            },
+            {  
+                type    => 'Select',
+                name    => 'next_section',
+                label   => 'Next Section:',
+                options => $self->section_select_options,
+            },
+        ],
+    };
+};
+
+around template_source => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $butt_label = $self->section_line->params->{button_label};
+    $butt_label = 'Click to go on' unless defined $butt_label;
+
+    my $tt = qq|
+
+    <div class='tool_button_next'>
+    <input type="submit" name="[% input_name( 'next_section_button' ) %]" value="$butt_label">
+    </div>
+
+    |;
+
+    return $tt;
+};
+
+around next_display_section_id => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $next_section_id = $self->$orig(@_);
+
+    my $submitted   = $self->reader->reading->active_read_section->params;
+    my $myformvars  = $self->_extract_display_formvars( $submitted );
+
+    if ( $myformvars->{'next_section_button'} ) {
+
+        # detected that the next button has been clicked, lets tell the caller
+        # which section id to move to
+
+        $next_section_id = $self->section_line->params->{next_section};
+
+    }
+
+    return $next_section_id;
+
+};
+
+around onward_section_ids => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $ids = $self->$orig(@_);
+
+    if ( $self->section_line->params ) {
+        push ( @{ $ids }, $self->section_line->params->{next_section} );
+    }
+
+    return $ids;
+};
+
+__PACKAGE__->meta->make_immutable;
+1;

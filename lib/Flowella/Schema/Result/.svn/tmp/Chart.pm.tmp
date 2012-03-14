@@ -1,0 +1,111 @@
+package Flowella::Schema::Result::Chart;
+
+# Created by DBIx::Class::Schema::Loader
+# DO NOT MODIFY THE FIRST PART OF THIS FILE
+
+use strict;
+use warnings;
+
+use base 'DBIx::Class::Core';
+
+__PACKAGE__->load_components("InflateColumn::DateTime");
+
+=head1 NAME
+
+Flowella::Schema::Result::Chart
+
+=cut
+
+__PACKAGE__->table("charts");
+
+=head1 ACCESSORS
+
+=head2 id
+
+  data_type: 'integer'
+  is_auto_increment: 1
+  is_nullable: 0
+
+=head2 name
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 25
+
+=head2 added
+
+  data_type: 'timestamp'
+  default_value: current_timestamp
+  is_nullable: 0
+
+=head2 updated
+
+  data_type: 'timestamp'
+  default_value: current_timestamp
+  is_nullable: 0
+
+=cut
+
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
+  "name",
+  { data_type => "varchar", is_nullable => 0, size => 25 },
+  "added",
+  {
+    data_type     => "timestamp",
+    default_value => \"current_timestamp",
+    is_nullable   => 0,
+  },
+  "updated",
+  {
+    data_type     => "timestamp",
+    default_value => \"current_timestamp",
+    is_nullable   => 0,
+  },
+);
+__PACKAGE__->set_primary_key("id");
+__PACKAGE__->add_unique_constraint("name_unique", ["name"]);
+
+=head1 RELATIONS
+
+=head2 sections
+
+Type: has_many
+
+Related object: L<Flowella::Schema::Result::Section>
+
+=cut
+
+__PACKAGE__->has_many(
+  "sections",
+  "Flowella::Schema::Result::Section",
+  { "foreign.chart_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 readings
+
+Type: has_many
+
+Related object: L<Flowella::Schema::Result::Reading>
+
+=cut
+
+__PACKAGE__->has_many(
+  "readings",
+  "Flowella::Schema::Result::Reading",
+  { "foreign.chart_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07010 @ 2011-12-20 10:07:50
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:l0tyQH3jJHfziQtz/jtWPA
+
+# ABSTRACT: Flowchart creator, manager and runner.
+
+use Moose;
+with 'Flowella::Schema::Roles::Result::Chart';
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+1;

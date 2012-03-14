@@ -1,0 +1,155 @@
+package Flowella::Schema::Roles::Result::SectionLine;
+# ABSTRACT: Flowchart creator, manager and runner.
+
+use Moose::Role;
+use DBIx::Class::InflateColumn::Serializer;
+
+=head1 NAME
+
+Flowella::Schema::Roles::Result::SectionLine - Role for corresponding class.
+
+=head1 CLASS ALTERATIONS
+
+SchemaLoader handles building the skelatal structure of the ResultSet for now,
+any changes to the column definitions can be calling the setup/configuration 
+methods again.
+
+=cut
+
+Flowella::Schema::Result::SectionLine->load_components(
+    'InflateColumn::Serializer',
+    'DynamicDefault',
+);
+Flowella::Schema::Result::SectionLine->add_columns(
+    'params' => {
+        'data_type'         => 'blob',
+        'serializer_class'  => 'JSON',
+    },
+    "weight",
+    {  
+        data_type                   => "integer",
+        default_value               => 0,
+        is_nullable                 => 0,
+        dynamic_default_on_create   => \&weight_dynamic_default_on_create
+    },
+);
+
+=head1 METHODS
+
+=over
+
+=item weight_dynamic_default_on_create
+
+Returns the default for the weight. Applied via the componant DynamicDefault.
+
+=cut
+
+sub weight_dynamic_default_on_create
+{
+    my $self = shift;
+    my $section = $self->section;
+    my $max_weight = $section->section_lines->get_column('weight')->max();
+    $max_weight ||= 0;
+    return ( $max_weight + 1 );
+}
+
+=item tool 
+
+Method to dynamically find and load the tool linked to this SectionLine.
+Finds the tool by matching the 'tool_ref' against this found by Flowella. 
+
+SectionLines are linked to tool classes, this instanciatd the tool class 
+passing in the sectionline result object.
+
+B<Returns>
+
+ObjectRef   - Instanciated tool object.
+
+=cut
+
+sub tool {
+    my $self = shift;
+
+    my @args = ();
+    @args = @_ if @_;
+
+    my $class = $self->result_source->schema->available_tool_classes->{ 
+        $self->tool_ref
+    };
+
+    carp("Could not find class for tool referenced via:" . $self->tool_ref ) 
+        unless $class;
+
+    # build new object of the tool class (passing in the schema)
+    Class::MOP::load_class($class);
+    my $obj = $class->new( 
+        section_line => $self,
+        @args, 
+    );
+
+    return $obj;
+}
+
+=item edit_html
+
+Check the object this SectionLine is linked to and returns it edit_html
+
+=cut
+
+sub edit_html {
+    my $self = shift;
+    return $self->tool->edit_html;
+}
+
+=item edit_process( $form_data )
+
+Method called when processing an edit of a SectionLine
+
+Args: hashref - Form Data 
+Returns: boolean (success or failed)
+
+=cut
+
+sub edit_process {
+    my $self = shift;
+
+    my ( $form_data ) = @_;
+
+    $self->params( $form_data );
+    $self->update();
+
+    return $self->tool->is_edit_ok;
+}
+
+=item onward_sections
+
+Tools can be used to reference other sections therefore becoming effective 
+links/connections within the chart. 
+This method returns a resultset of possible sections the tool linked to this 
+SectionLine "might" reference. (is say "might" because at the moment I do not 
+know how the tools will workout which section to reference)
+
+=cut
+
+sub onward_sections {
+    my $self = shift;
+
+    my @sections;
+    my @section_ids = @{ $self->tool->onward_section_ids };
+    foreach ( @section_ids ) {
+        my $section = $self->section->chart->sections->find( $_ );
+        push ( @sections, $section) if $section;
+    }
+
+    # make a resultset out of the list of sections..
+    my $new_rs = $self->result_source->resultset;
+    $new_rs->set_cache( \@sections );
+    return $new_rs;
+
+}
+
+=back
+
+=cut
+
+1;

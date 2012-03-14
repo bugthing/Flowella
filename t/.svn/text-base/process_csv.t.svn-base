@@ -1,0 +1,61 @@
+
+use Modern::Perl;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+use Test::More;
+use FlowellaTest;
+
+ok( my $schema = FlowellaTest::_get_schema() );
+
+$schema->txn_begin;
+
+# Create
+
+ok( my $datasource = $schema->resultset('DataSource')->find_or_create( { name => 'Test CSV based source', type => 'csv' } ) );
+isa_ok( $datasource, 'Flowella::Schema::Result::DataSource::CSV' );
+
+# Import
+
+cmp_ok( $datasource->import_csv_file( "$Bin/etc/example.csv" ), '==', 3 );
+# .. validate import..
+ok( my $row = $datasource->csv_data_rows->find( { row_index => 1 } ) );
+is_deeply( 
+    { 
+        id          => 1, 
+        name        => 'Bill Shankley',
+        age         => 56,
+        sex         => 'm',
+        postcode    => 'MK18 3PN',
+    }, 
+    $row->data_hash 
+);
+
+# Searching
+
+ok( my $rows_rs = $datasource->match_data_rows( { sex => 'm' } ) );
+cmp_ok( $rows_rs->count, '==', 2 );
+
+ok( $rows_rs = $datasource->match_data_rows( { sex => 'm', age => '26' } ) );
+cmp_ok( $rows_rs->count, '==', 1 );
+cmp_ok( $rows_rs->first->data_hash->{name}, 'eq', 'James Peterson' );
+
+# Reading Row
+
+ok( $row = $datasource->find_or_create_related('csv_data_rows', { reading_id => 1 } ) );
+ok( $row->set( name => 'Dobby McFace' ) );
+# .. check it returns all the rows (even thou we have not set then) (csv style)
+is_deeply( 
+    { 
+        id          => undef,
+        name        => 'Dobby McFace',
+        age         => undef,
+        sex         => undef,
+        postcode    => undef,
+    }, 
+    $row->data_hash 
+);
+
+$schema->txn_rollback;
+
+done_testing();
+

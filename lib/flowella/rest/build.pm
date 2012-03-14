@@ -1,0 +1,139 @@
+package flowella::rest::build;
+# ABSTRACT: Flowchart creator, manager and runner.
+
+# dancer
+
+use Dancer;
+use Dancer::Plugin::REST;
+use Flowella;
+prefix '/rest/build';
+set serializer => 'JSON';
+
+my $flowella    = Flowella->new( dsn => config->{flowella}->{dsn} );
+
+# allow REST API to my accessed from outside this application.
+hook before => sub {
+    header 'access_control_allow_origin' => '*';
+};
+
+=head1 NAME
+
+flowella::rest::build - REST API building a Flowella chart
+
+=head1 DESCRIPTION
+
+A REST API for building a Flowella chart.
+
+=head1 ROUTES
+
+=head2 REST - Tools
+
+=cut
+
+resource tool =>
+    'get'    => sub {},
+    'create' => sub {},
+    'delete' => sub {},
+    'update' => sub {},
+;
+
+# manually added '/tools' route to do a list..
+get '/tools' => sub {
+    status_ok( $flowella->get_tools );
+};
+
+=head2 REST - Chart
+
+=cut
+
+resource chart =>
+    'get'    => \&on_get_chart,
+    'create' => \&on_create_chart,
+    'delete' => sub {},
+    'update' => sub {},
+;
+
+sub on_get_chart {
+    status_ok( $flowella->get_chart_by_id( params->{id} ) );
+}
+sub on_create_chart {
+    my $data = params;
+    status_created( $flowella->create_chart( $data ) );
+}
+
+=head2 REST - Section
+
+=cut
+
+resource section =>
+    'get'    => \&on_get_section,
+    'create' => \&on_create_section,
+    'update' => \&on_update_section,
+    'delete' => \&on_delete_section,
+;
+
+sub on_get_section {
+    status_ok( $flowella->get_section_by_id( params->{id} ) );
+}
+sub on_create_section {
+    my $data = params;
+    status_created( $flowella->create_section( $data ) );
+}
+sub on_update_section {
+    my $data = params;
+    status_accepted( $flowella->update_section( $data ) );
+}
+sub on_delete_section {
+    my $data = params;
+    status_ok( $flowella->delete_section( params->{id} ) );
+}
+
+=head2 REST - SectionLine
+
+=cut
+
+resource section_line =>
+    'get'       => \&on_get_section_line,
+    'create'    => \&on_create_section_line,
+    'update'    => \&on_update_section_line,
+    'delete'    => \&on_delete_section_line,
+;
+
+sub on_get_section_line {
+    status_ok( $flowella->get_section_line_by_id( params->{id} ) );
+}
+sub on_create_section_line {
+    my $data = params;
+    status_created( $flowella->create_section_line( $data ) );
+}
+sub on_update_section_line {
+    my $data = params;
+    status_accepted( $flowella->update_section_line( $data ) );
+}
+sub on_delete_section_line {
+    my $data = params;
+    status_ok( $flowella->delete_section_line( params->{id} ) );
+}
+
+=head2 REST - Onward Section
+
+=cut
+
+resource onward_section =>
+    'get'    => sub{},
+    'create' => \&on_create_onward_section,
+    'delete' => sub {},
+    'update' => sub {},
+;
+
+sub on_create_onward_section {
+    my $data = params;
+    status_created( $flowella->create_onward_section( $data ) );
+}
+
+=over
+
+=back
+
+=cut
+1;

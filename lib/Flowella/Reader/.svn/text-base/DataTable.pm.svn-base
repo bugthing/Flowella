@@ -1,0 +1,92 @@
+package Flowella::Reader::DataTable;
+# ABSTRACT: Flowchart creator, manager and runner.
+
+use Moose;
+
+extends 'Flowella::Reader';
+
+=head1 NAME
+
+Flowella::Reader::CsvData - Reader that centres around a CSV file.
+
+=head1 DESCRIPTION
+
+Subclass of Flowell::Schema::Process to add extra functionality based on the 
+'type' field. 
+
+Used by the Flowella system to add extra functionality when 'reading' a 
+process.
+
+=cut
+
+# REQUIRED by any Reader!
+around 'ref'    => sub { 'data_table' };
+
+
+
+has 'dsn'       => ( is => 'ro', isa => 'Str', default => "dbi:SQLite:dbname=./etc/db/datatable.db" );
+
+has 'schema'    => ( is => 'ro', isa => 'Flowella::Reader::DataTable::Schema', lazy_build => 1 );
+sub _build_schema {
+    my $self = shift;
+    return Flowella::Reader::DataTable::Schema->connect( $self->dsn );
+}
+
+has 'table'     => ( is => 'ro', isa => 'Flowella::Reader::DataTable::Schema::Result::DataTable', lazy_build => 1 );
+sub _build_table {
+    my $self = shift;
+    return $self->schema->resultset('DataTable')->find_or_create( { name => $self->params->{data_table_name} } );
+}
+
+=head1 METHODS MODIFERS
+
+=over
+
+=item around -> display_html()
+
+Sees if it can find a csv row based on reading_id and puts data into stash.
+
+=cut
+
+around display_html => sub {
+    my ($orig, $self) = (shift, shift);
+
+    # see if have record. if we do, put data in the stash.
+    my $row = $self->table->find_related('data_table_rows', { reading_id => $self->reading->id } );
+    $self->stash->{data} = $row->data_hash if ( $row && $row->data_table_cols->count > 0 );
+
+    return $self->$orig();
+
+};
+
+=item around -> display_process( $form_data )
+
+Takes stuff from the stash and saves to data table.
+
+=cut
+
+around display_process => sub {
+    my ($orig, $self) = (shift, shift);
+
+    my ( $form_data ) = @_;
+
+    my $return = $self->$orig( $form_data );
+
+    # save stuff from the stash into the db if it processed ok..
+    if ( $return ) {
+        my $row = $self->table->find_or_create_related('data_table_rows', { reading_id => $self->reading->id } );
+        for( keys %{ $self->stash->{data} } ) {
+            $row->set( $_ => $self->stash->{data}->{$_} );
+        }
+    }
+
+    return $return;
+
+};
+
+=back
+
+=cut
+
+__PACKAGE__->meta->make_immutable;
+1;

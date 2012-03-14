@@ -11,6 +11,83 @@
    ./boil.sh Flowella
    cd Flowella
 
- Imported into the git repo like this:
-   git remote add origin git@github.com:bugthing/Flowella.git 
+##############################################################################
+Start the App:
 
+    plackup --port 9090 bin/app.psgi
+
+##############################################################################
+
+##############################################################################
+Database related commands:
+
+    # Flowella::Schema 
+
+    # demo database.
+    sqlite3 ./etc/db/flowella.db < ./etc/db/schema.sql
+
+    # test database.
+    sqlite3 ./t/etc/db/flowella.db < ./etc/db/schema.sql
+    sqlite3 ./t/etc/db/flowella.db < ./t/etc/db/test_data.sql
+
+    # build DBIx::Class:
+
+    dbicdump -o dump_directory=./lib \
+        -o components='["InflateColumn::DateTime"]' \
+        -o debug=1 \
+        Flowella::Schema \
+        'dbi:SQLite:dbname=./etc/db/flowella.db' 
+
+    # Flowella::Reader::DataTable::Schema
+
+    sqlite3 ./etc/db/datatable.db < ./etc/db/datatable_schema.sql
+
+    dbicdump -o dump_directory=./lib \
+        -o components='["InflateColumn::DateTime"]' \
+        -o debug=1 \
+        Flowella::Reader::DataTable::Schema \
+        'dbi:SQLite:dbname=./etc/db/datatable.db' 
+
+##############################################################################
+
+##############################################################################
+Mass search and replace
+
+    find . -name "*.*" -print -type f | xargs sed -i 's/foo/bar/g'
+
+##############################################################################
+
+##############################################################################
+Use Interface:
+   
+    CSS - Layout: 
+        http://twitter.github.com/bootstrap/
+
+    JS Framework:
+        http://jquery.com/
+
+    JS UI Parts (drap'n'drop etc.):
+        http://jqueryui.com/
+
+    Flow chart visualisation:
+        http://jsplumb.org/
+
+##############################################################################
+
+##############################################################################
+Build and Deploy - 
+
+    Using: DotCloud (http://docs.dotcloud.com/)
+        sudo aptitude install python-setuptools
+        sudo easy_install dotcloud
+        dotcloud create flowella
+
+    Build:
+        dzil build
+
+    Deploy:
+        dotcloud push flowella
+        (you may need to update dotcloud.yml to point the build dir)
+
+
+##############################################################################

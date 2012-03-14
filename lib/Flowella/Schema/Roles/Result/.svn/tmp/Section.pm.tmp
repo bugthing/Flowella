@@ -1,0 +1,133 @@
+package Flowella::Schema::Roles::Result::Section;
+# ABSTRACT: Flowchart creator, manager and runner.
+
+use Moose::Role;
+
+=head1 NAME
+
+Flowella::Schema::Roles::Result::Section - Role for corresponding class.
+
+=head1 CLASS ALTERATIONS
+
+SchemaLoader handles building the skelatal structure of the ResultSet for now,
+any changes to the column definitions can be calling the setup/configuration 
+methods again.
+
+=cut
+
+Flowella::Schema::Result::Section->load_components(
+    'DynamicDefault',
+);
+Flowella::Schema::Result::Section->add_columns(
+    "name",
+    { 
+        data_type                   => "varchar", 
+        is_nullable                 => 0, 
+        size                        => 25,
+        dynamic_default_on_create   => \&name_dynamic_default_on_create
+    },
+    "weight",
+    { 
+        data_type                   => "integer", 
+        default_value               => 0, 
+        is_nullable                 => 0,
+        dynamic_default_on_create   => \&weight_dynamic_default_on_create
+    },
+);
+
+# turn cascade deleting on.
+# ensure the order of the section_lines returned.
+Flowella::Schema::Result::Section->has_many(
+  "section_lines",
+  "Flowella::Schema::Result::SectionLine",
+  { "foreign.section_id" => "self.id" },
+  { 
+      cascade_copy      => 0, 
+      cascade_delete    => 1,
+      order_by          => { -asc => 'weight'},
+  },
+);
+
+
+
+
+=head1 METHODS
+
+=over
+
+=item name_dynamic_default_on_create
+
+Returns the default for the name. Applied via the componant DynamicDefault.
+
+=cut
+
+sub name_dynamic_default_on_create
+{
+    my $self = shift;
+    my $chart = $self->chart;
+    my $number_of_sections = $chart->sections->count;
+    return 'Section ' . ($number_of_sections + 1);
+}
+
+=item weight_dynamic_default_on_create
+
+Returns the default for the weight. Applied via the componant DynamicDefault.
+
+=cut
+
+sub weight_dynamic_default_on_create
+{
+    my $self = shift;
+    my $chart = $self->chart;
+    my $max_weight = $chart->sections->get_column('weight')->max();
+    $max_weight ||= 0;
+    return ( $max_weight + 1 );
+}
+
+=item onward_sections
+
+Gets a result set of Sections that can be out going from this Section. Works 
+by asking each SectionLine what 'onward_sections' it has, removing any dupes
+and then returning a ResultSet of the final list of Sections.
+
+=cut
+
+sub onward_sections {
+    my $self = shift;
+
+    my @all_outgoing_sections;
+
+    my $section_lines_rs = $self->section_lines;
+    while ( my $section_line = $section_lines_rs->next ) {
+
+        my $out_sections_rs = $section_line->onward_sections;
+
+        # ensure we do not return dupes by only adding sections
+        # we have NOT already added to the list.
+        push ( 
+            @all_outgoing_sections,
+            ( 
+                grep {
+                    my $out_sec = $_;
+                    my $exists  = 0;
+                    foreach my $got_sec ( @all_outgoing_sections ) {
+                        $exists = 1 if ( $got_sec->id eq $out_sec );
+                    }
+                    ! $exists;
+                } ( $out_sections_rs->all )
+            )
+        );
+    }
+
+    # make a resultset out of the list of sections..
+    my $new_rs = $self->result_source->resultset;
+    $new_rs->set_cache( \@all_outgoing_sections );
+    return $new_rs;
+
+}
+
+=back
+
+=cut
+
+1;
