@@ -69,18 +69,9 @@ Flowella.SectionModel = Flowella.RESTModel.extend({
 Flowella.SectionlineModel = Flowella.RESTModel.extend({
     resourceUrl:  '/rest/build/section_line',
     resourceProperties: ['section_id','edit_html'],
+    // method that puts what you give it (data from 'edit_html' form)
     putFormData: function( data ) {
-        // method that puts what you give it (data from 'edit_html' form)
-        var self = this;
-        var resourceUrl = self._resourceUrl();
-        return jQuery.ajax({
-          url: resourceUrl,
-          dataType: 'json',
-          type: 'PUT',
-          'data': data
-        }).done( function(json) {
-          self.deserialize(json);
-        });
+        return this._doREST( 'PUT', data );
     },
 });
 

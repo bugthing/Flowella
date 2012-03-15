@@ -95,6 +95,49 @@ Flowella.chartController = Ember.Object.create({
         droppedSection.putREST();
         droppedSection.set('resourceProperties', old_list);
     },
+    onwardSection: function( fromSectionID, buttonLabel ) {
+
+        var data = {
+            buttons_next_counter: 1,
+            buttons_next_label_1: buttonLabel,
+            chart_id: this.chart.get('id'),
+            outward_section_id: fromSectionID,
+            tool_ref: 'buttons_next'
+        };
+        var url = '/rest/build/onward_section';
+
+        return jQuery.ajax({
+          'url': url,
+          dataType: 'json',
+          type: 'POST',
+          'data': data
+        }).done( function(json) {
+            var newSectionID = json.id;
+
+            var newSectionModel = Flowella.SectionModel.create({ id: newSectionID, })
+            newSectionModel.getREST().success( function(){
+
+                Flowella.chartSectionsController.pushObject( newSectionModel );
+
+                var newEdge = Flowella.EdgeModel.create({
+                    'fromSectionId': fromSectionID,
+                    'toSectionId': newSectionID,
+                    'label': buttonLabel
+                })
+
+                // build new array of edge objects, cos it the only I can get
+                // the view the redraw all the edges!..
+                var edges = new Array();
+                Flowella.chartEdgesController.get('content').forEach(function(edge) {
+                    edges.push( edge );
+                });
+                edges.push( newEdge );
+                Flowella.chartEdgesController.set('content', edges);
+
+            });
+
+        });
+    },
     editSection: function( sectionID ) {
 
         // find the section and get it from server ready for edit..

@@ -77,7 +77,7 @@ Flowella.ChartSectionView = Ember.View.extend({
                 'onwardsection': function(t) {
                     //controller.menuOnwardSection();
                     var view = Flowella.OnwardSectionModalView.create({
-                        fromSectionID: controllerID,
+                        fromSectionID: secID,
                     });
                     view.appendTo('#mainarea');
                 },
@@ -92,6 +92,7 @@ Flowella.ChartSectionView = Ember.View.extend({
 });
 
 Flowella.ChartEdgesView = Ember.View.extend({
+    templateName: 'list-chartedges',
     edgesBinding: 'Flowella.chartEdgesController',
     drawCount: 0,
     didInsertElement: function() {
@@ -101,7 +102,7 @@ Flowella.ChartEdgesView = Ember.View.extend({
         this.rerender();
     }.observes('edges.content'),
     drawEdges: function() {
-
+alert('drawing edges');
         var edges = this.get('edges').content;
 
         jsPlumb.Defaults.Connector = [ "Flowchart" ];
@@ -232,6 +233,13 @@ Flowella.OnwardSectionModalView = Ember.View.extend({
         $("#onwardsectionmodal").modal('show')
         $("#onwardsection_form")[0].reset();
         $("input:hidden[name=outward_section_id]" ).val( this.fromSectionID );
+        $( "#onwardsection_save" ).unbind('click');
+        $( "#onwardsection_save" ).bind('click', function() { 
+            var secID = $( "input:hidden[name=outward_section_id]" ).val();
+            var label = $( "input:text[name=button_label]" ).val();
+            Flowella.chartController.onwardSection(secID, label);
+            $("#onwardsectionmodal").modal('hide')
+        } );
     },
 });
 

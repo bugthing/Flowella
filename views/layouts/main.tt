@@ -74,9 +74,15 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="list-chartsections">
-      {{#each sections}}
-        {{view Flowella.ChartSectionView sectionBinding="this"}}
-      {{/each}}   
+    {{#each sections}}
+      {{view Flowella.ChartSectionView sectionBinding="this"}}
+    {{/each}}   
+</script>
+
+<script type="text/x-handlebars" data-template-name="list-chartedges">
+    {{#each edges}}
+        {{ label }}
+    {{/each}}   
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-chartsection">
