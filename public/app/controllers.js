@@ -58,7 +58,14 @@ Flowella.chartSectionLinesController = Ember.ArrayController.create({
                 Flowella.editSectionLineView.appendTo('#section_editarea');
             });
         });
-    }.observes('content')
+    }.observes('content'),
+
+    updateSectionLines: function( sectionLinesUpdateData ) {
+        this.get('content').forEach(function(secLine) {
+            var updateData = sectionLinesUpdateData[ secLine.id ];
+            // here I will do an REST PUT...
+        });
+    }
 });
 
 // Non-array controllers

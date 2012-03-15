@@ -125,13 +125,15 @@
         <div id="section_editarea">
         </div>
         <div>
-            <a href='' class='btn'> SAVE </a>
+            <a href='#' class='btn' {{action "saveSectionLines" on="click"}}> SAVE </a>
         </div>
     </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-editsectionline">
-    {{ section_line_edit editSrc }}
+    <div {{bindAttr id="editId" }} {{bindAttr class="editClass"}}>
+        {{ section_line_edit editSrc }}
+    </div>
 </script>
 
 

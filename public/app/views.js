@@ -180,11 +180,49 @@ Flowella.EditSectionView = Ember.View.extend({
     templateName: 'show-sectionedit',
     section_linesBinding: 'Flowella.chartSectionLinesController',
     sectionBinding: 'Flowella.chartSectionController',
+    saveSectionLines: function() {
+
+        // find all forms within the div, serialize and do ajax call
+        var sectionLinesData = {};
+        var section_line_weight = 0;
+        $('#section_editarea').find('.editsectionline').each( function( index, section_line_div ) {   
+        
+            var myRegexp = /^editsectionline_([0-9]+)$/;
+            var match = myRegexp.exec( section_line_div.id );
+            var section_line_id = match[1];
+
+            var section_line_form   = $(section_line_div).find('form');
+            var section_line_data   = $(section_line_form).serializeArray();
+            
+            // add weight to the json ..
+            section_line_weight++;
+            section_line_data.push({
+                name: 'weight',
+                value: section_line_weight
+            }); 
+            section_line_data.weight = section_line_weight;
+
+            // store the info in an object to pass to controller..
+            sectionLinesData[ section_line_id ] = section_line_data;
+
+        });
+
+        // pass edit info to controller..
+        this.section_lines.updateSectionLines( sectionLinesData );
+    
+        // take this view out the DOM
+        this.remove();
+    }
 });
 
 Flowella.EditSectionLineView = Ember.View.extend({
     templateName: 'show-editsectionline',
     section_line: Ember.required(),
+
+    editClass: 'editsectionline',
+    editId: function() {
+        return 'editsectionline_' + this.get('section_line').id;
+    }.property('section_line'),
     editSrc: function() {
         return this.get('section_line').edit_html;
     }.property('section_line'),
