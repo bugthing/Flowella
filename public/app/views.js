@@ -60,7 +60,7 @@ Flowella.ChartSectionView = Ember.View.extend({
     }.property('section'),
     didInsertElement: function() {
 
-        var controllerID = this.get('section').id;
+        var secID = this.get('section').id;
 
         // link the section div to context menu..
         this.$().contextMenu(
@@ -69,19 +69,17 @@ Flowella.ChartSectionView = Ember.View.extend({
             shadow: true,
             bindings: {
                 'edit': function(t) {
-                    Flowella.chartSectionController.editSection( controllerID )
-                    //var secID = parse_section_id( t.id );
-                    //build_section_edit_area( secID );
+                    Flowella.chartController.editSection( secID )
                 },
                 'delete': function(t) {
-                    controller.menuDelete();
-                    //var secID = parse_section_id( t.id );
-                    //del_section( secID );
+                    Flowella.chartController.delSection( secID )
                 },
                 'onwardsection': function(t) {
-                    controller.menuOnwardSection();
-                    //var secID = parse_section_id( t.id );
-                    //dialog_for_onward_section( secID );
+                    //controller.menuOnwardSection();
+                    var view = Flowella.OnwardSectionModalView.create({
+                        fromSectionID: controllerID,
+                    });
+                    view.appendTo('#mainarea');
                 },
                 'newsection': function(t) {
                     controller.menuNewSection();
@@ -107,16 +105,22 @@ Flowella.ChartEdgesView = Ember.View.extend({
         var edges = this.get('edges').content;
 
         jsPlumb.Defaults.Connector = [ "Flowchart" ];
+        jsPlumb.Defaults.DropOptions = {
+            tolerance:"touch",
+            drop: function(e, ui) {
+                var dragged = ui.draggable;
+                var matched = dragged.attr('id').match( /^section_([0-9]+)/ );
+                if ( matched.length > 1 ) {
+                    var sectionID = matched[1];
+                    var pos = dragged.position();
+                    Flowella.chartController.dropSection( sectionID, pos.left, pos.top );
+                }
+            }
+        };
         jsPlumb.makeTarget(
             'chartvisual',
             {
                 isTarget: true,
-                dropOptions:{
-                    tolerance:"touch",
-                    drop: function(e, ui) {
-                        //drop_endpoint( ui.draggable, $(thisChart) );
-                    }
-                }
             }
         );
 
@@ -156,12 +160,6 @@ Flowella.ChartEdgesView = Ember.View.extend({
                     maxConnections: -1,
                     isSource: false,
                     isTarget: true,
-                    dropOptions:{
-                        tolerance:"touch",
-                        drop: function(e, ui) {
-                            //drop_endpoint( ui.draggable, $(thisChart) );
-                        }
-                    }
                 }
             );
             var connection = jsPlumb.connect({ source: source_ep, target: target_ep, overlays:overlays});
@@ -190,7 +188,6 @@ Flowella.EditSectionView = Ember.View.extend({
             var myRegexp = /^editsectionline_([0-9]+)$/;
             var match = myRegexp.exec( section_line_div.id );
             var section_line_id = match[1];
-
             var section_line_form   = $(section_line_div).find('form');
             var section_line_data   = $(section_line_form).serializeArray();
             
@@ -200,7 +197,7 @@ Flowella.EditSectionView = Ember.View.extend({
                 name: 'weight',
                 value: section_line_weight
             }); 
-            section_line_data.weight = section_line_weight;
+            // DO WE NEED THIS?? section_line_data.weight = section_line_weight;
 
             // store the info in an object to pass to controller..
             sectionLinesData[ section_line_id ] = section_line_data;
@@ -226,6 +223,16 @@ Flowella.EditSectionLineView = Ember.View.extend({
     editSrc: function() {
         return this.get('section_line').edit_html;
     }.property('section_line'),
+});
+
+
+Flowella.OnwardSectionModalView = Ember.View.extend({
+    templateName: 'show-chartsectiononward',
+    didInsertElement: function() {
+        $("#onwardsectionmodal").modal('show')
+        $("#onwardsection_form")[0].reset();
+        $("input:hidden[name=outward_section_id]" ).val( this.fromSectionID );
+    },
 });
 
 // Container views..

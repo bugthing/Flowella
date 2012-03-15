@@ -20,6 +20,7 @@
     <!-- css styles -->
 
     <link href="./css/bootstrap/bootstrap.css" rel="stylesheet">
+    
     <style>
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
@@ -180,6 +181,10 @@
     <script src="./js/jquery.jsPlumb-1.3.7-all.js"></script>
     <script src="./js/jquery.contextmenu.r2.js"></script>
 
+    <!-- Bootstrap JS -->
+    <script src="/js/bootstrap/bootstrap-modal.js"></script>
+
+    <!-- EmberJS -->
     <script src="./js/emberjs/ember.js"></script>
 
     <script src="./app/app.js"></script>
