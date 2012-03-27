@@ -100,24 +100,19 @@ Flowella.chartSectionController = Ember.Object.create({
     editSection: function( id ) {
         var section = Flowella.SectionModel.create({'id': id});
         section.getREST().success( function(){
-            alert( 'edit:' + section.id );
-            Flowella.chartSectionController.set('section', section);
-        });
-    },
-    menuEdit: function() {
-        var section = Flowella.chartSectionController.get('section');
-        section.getREST().success( function(json) {
 
-            // build array of edge objects..
+            Flowella.chartSectionController.set('section', section);
+
+            // build array of sectioneline objects..
             var section_lines = new Array();
             for( var i=0; i < section.section_lines.length; i++ ) {
-                section_lines.push(
-                     Flowella.SectionlineModel.create({
-                        id: section.section_lines[i].id,
-                        tool_ref: section.section_lines[i].tool_ref,
-                        weight: section.section_lines[i].weight
-                    })
-                );
+                var sl =  Flowella.SectionlineModel.create({
+                    id: section.section_lines[i].id,
+                    tool_ref: section.section_lines[i].tool_ref,
+                    weight: section.section_lines[i].weight
+                });
+                sl.getREST();
+                section_lines.push( sl );
             }
         
             Flowella.chartSectionLinesController.set('content', section_lines );

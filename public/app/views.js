@@ -191,3 +191,11 @@ Flowella.ChartContainerView = Ember.ContainerView.extend({
     edgesView: Flowella.ChartEdgesView,
     sectionMenu: Flowella.ChartSectionMenuView,
 });
+
+
+// HandleBars - section edit helper
+Handlebars.registerHelper('section_edit', function(property) {
+  var value = Ember.getPath(this, property);
+  var str = '<span class="highlight">'+value+'</span>';
+  return new Handlebars.SafeString( str );
+});

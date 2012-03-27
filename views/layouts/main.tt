@@ -120,9 +120,7 @@
 
 <script type="text/x-handlebars" data-template-name="show-sectionlines">
     {{#each section_lines}}
-        <div>
-            {{tool_ref}}
-        </div>
+        {{tool_ref}}
     {{/each}}
 </script>
 
