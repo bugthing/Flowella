@@ -1,0 +1,94 @@
+<!-- EmberJS - view handlebar templates -->
+<script type="text/x-handlebars" data-template-name="list-charts">
+    {{#each charts}}
+      {{#view Flowella.ChartListItemView chartBinding="this" }}
+          {{#with chart}}
+            <a href='#'>{{name}}</a>
+          {{/with}}   
+      {{/view}}   
+    {{/each}}   
+</script>
+
+<script type="text/x-handlebars" data-template-name="list-tools">
+    <div id="toolsvisual">
+        {{#each tools}}
+            {{#view Flowella.ToolListItemView toolBinding="this" }}
+                <div class="ui-widget-content btn charttool" id="{{tool.ref}}">{{tool.name}}</div>
+            {{/view}}   
+        {{/each}}   
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-chart">
+    <div id="chartvisual"> Chart: {{chart.title}} </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="list-chartsections">
+    {{#each sections}}
+      {{view Flowella.ChartSectionView sectionBinding="this"}}
+    {{/each}}   
+</script>
+
+<script type="text/x-handlebars" data-template-name="list-chartedges">
+    {{#each edges}}
+        {{ label }}
+    {{/each}}   
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-chartsection">
+    <div class="sectionnode" {{bindAttr id="id"}} {{bindAttr style="divStyle"}} > 
+        {{name}}
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-chartsectiononward">
+    <div class="modal" id="onwardsectionmodal">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">x</a>
+            <h3>OnwardSection</h3>
+        </div>
+        <div class="modal-body">
+            <form class='form-stacked' id='onwardsection_form'>
+                <input type="hidden" name="outward_section_id"/>
+                <fieldset>
+                    <label for="onwardsection_text">Button Label</label>
+                    <input type="text"name="button_label" />
+                </fieldset>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btnbtn-primary" id='onwardsection_save'>
+                Save changes
+            </a>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-chartsectionmenu">
+    <div class="contextMenu" id="sectionMenu" style='display:none;'>
+      <ul>
+        <li id="edit">          Edit           </li>
+        <li id="delete">        Delete         </li>
+        <li id="onwardsection"> Onward Section </li>
+        <li id="newsection">    New Section    </li>
+      </ul>
+    </div>
+</script>
+
+
+<script type="text/x-handlebars" data-template-name="show-sectionedit">
+    <div>
+        <div>Section: {{section.section.name}}</div>
+        <div id="section_editarea">
+        </div>
+        <div>
+            <a href='#' class='btn' {{action "saveSectionLines" on="click"}}> SAVE </a>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-editsectionline">
+    <div {{bindAttr id="editId" }} {{bindAttr class="editClass"}}>
+        {{ section_line_edit editSrc }}
+    </div>
+</script>

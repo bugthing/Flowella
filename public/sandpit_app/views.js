@@ -102,7 +102,7 @@ Flowella.ChartEdgesView = Ember.View.extend({
         this.rerender();
     }.observes('edges.content'),
     drawEdges: function() {
-alert('drawing edges');
+//alert('drawing edges');
         var edges = this.get('edges').content;
 
         jsPlumb.Defaults.Connector = [ "Flowchart" ];
@@ -210,7 +210,19 @@ Flowella.EditSectionView = Ember.View.extend({
     
         // take this view out the DOM
         this.remove();
-    }
+    },
+    didInsertElement: function() {
+        //alert('added tools'); 
+        //$("#section_editarea").sortable();
+        $("#section_editarea").droppable({
+            accept: '.charttool',
+            drop: function(event, ui) {
+                alert('dropped'); 
+                //var tool_ref = ui.draggable.attr('id');
+                //section.newSectionLine( tool_ref, whenLoadedFunc );
+            }
+        });
+    },
 });
 
 Flowella.EditSectionLineView = Ember.View.extend({

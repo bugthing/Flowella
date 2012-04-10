@@ -1,64 +1,32 @@
-[% BLOCK inline_css %]
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="hero-unit">
 
-/* chart visual */
+            <h1>Welcome to Flowella <small> Where a process becomes reality</small></h1>
 
-.sectionnode {
-    border:1px solid #346789;
-    z-index:20;
-    position:absolute;
-    padding: 8px;
-    font-size: 15px;
-}
+            <p> &nbsp; </p>
 
-#toolsvisual {
-    width: 100%;
-    min-height: 40px;
-}
-#toolsvisual div {
-    float: left;
-}
-
-/* newSectionDialog */
-
-#onwardsectionmodal {
-    display:none;
-}
-
-/*  jsPlumb related */
-
-._jsPlumb_connector {
-    z-index:4;
-}
-._jsPlumb_endpoint {
-    z-index:5;
-}
-._jsPlumb_overlay {
-    z-index:6;
-}
-.edge-label {
-    background-color:white;
-    padding: 1px;
-    font:12px sans-serif;
-    color: #346789;
-    z-index:21;
-    border:1px dotted gray;
-    opacity:0.8;
-    filter:alpha(opacity=80);
-}
-
-[% END %] 
-
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="span10" id='mainarea'>
-            <!-- mainarea content-->
-            <h1>Welcome</h1>
-            <p>Feel free to click about and see what possible</p>
+            <h3>Process Engine</h3>
+            <p>
+                Flowella is a software service that allows the user to build and
+                manage a number of processes.
+            </p>
+            <p>
+                Each process is built by creating a flow chart using the easy to 
+                use online interface.
+            </p>
+            <p>
+                Each node of the flow chart is built from any number or combination
+                of tools.
+            </p>
+            <p>
+                Tools can be selected from a default list or custom made to
+                suit any requirement.
+            </p>
+            <p>
+                Being flexible and customisable enables Flowella to meet many
+                requirements from the simple to the complex.
+            </p>
+          </div>
         </div>
-        <div class="span2" id='sidebar'>
-            <!-- sidebar content -->
-        </div>
-    </div>
-</div>
-
-
+      </div>
