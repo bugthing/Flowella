@@ -1,0 +1,72 @@
+[% META menu_hilight = 'Charts' %]
+
+<div class="row-fluid">
+
+  <div class="span9">
+    <div class="hero-unit">
+      <h1> Charts </h1>
+      <div class="alert-message block-message info">
+
+          <p> Existing charts are listed on the right, click one to start editing </p>
+
+          <p> New charts can be created by filling in a name in the box below and clicking the 'Add Chart' button </p>
+
+          <form id='newchartform'>
+              Chart Name 
+              <input type='text' name='name'> 
+              <input type='submit' name='newchart' value='Add Chart'> 
+          </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="span3">
+    <div class="well sidebar-nav">
+
+
+<script type="text/x-handlebars">
+    <ul class="nav nav-list" id='chartsList'>
+    {{#each FApp.chartsController}}
+        <li>
+            <a {{bindAttr href="buildUrl"}}>{{ name }}</a>
+        </li>
+    {{/each}}
+    </ul>    
+</script>
+
+
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+[% BLOCK inline_js %]
+
+FApp.chartsController.load();
+
+//var loadChartsFunc = function(){ build_charts_table(); }
+//
+//var f = new Flowella({
+//    whenReady: loadChartsFunc 
+//});
+//
+//$('#newchartform').submit(function() {
+//    var chartname = $('[name=name]').val();
+//    f.builder.newChart( chartname, loadChartsFunc );
+//    return false;
+//});
+//
+//function build_charts_table() {
+//
+//    var html = "";
+//    for ( var chart_id in f.charts ) {
+//        html = html 
+//        + '<li><a href="/builder?chart=' + f.charts[chart_id].id 
+//        + '">' + f.charts[chart_id].name + '</a></li>'
+//    }
+//
+//    $("#chartsList").html( html );
+//}
+
+[% END %]

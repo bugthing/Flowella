@@ -62,29 +62,15 @@
             <span class="icon-bar"></span>
           </a>
           <a class="brand" href="#">Flowella - Process Engine</a>
-
-          <div class="nav-collapse">
-            <ul class="nav">
-
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul>
-            <p class="navbar-text pull-right">Logged in as <a href="#">username</a></p>
-          </div><!--/.nav-collapse -->
-
-
           <div class="nav-collapse">
             <ul class="nav">
                 [% FOREACH mk IN menu.keys %]
                     <li [% IF mk == menu_hilight %] class="active" [% END %]><a href="[% menu.$mk %]">[% mk %]</a></li> 
                 [% END %]
             </ul>
-
             [% IF user %]
                 <p class="navbar-text pull-right">Logged in as <a href="#">[% user %]</a></p>
             [% END %]
-
           </div>
         </div>
       </div>
@@ -115,9 +101,8 @@
     <script src="./js/bootstrap/bootstrap-carousel.js"></script>
     <script src="./js/bootstrap/bootstrap-typeahead.js"></script>
 
-    <!-- EmberJS 
+    <!-- EmberJS -->
     <script src="./js/emberjs/ember.js"></script>
--->
 
     <!-- Flowella - Custom JS -->
 
@@ -126,8 +111,8 @@
     <script src="./js/flowella-chart-visual-jsplumb.js"></script>
     <script src="./js/flowella-section-edit.js"></script>
 
+    <script src="./js/app/app.js"></script>
     <!--
-    <script src="./app/app.js"></script>
     <script src="./app/models.js"></script>
     <script src="./app/controllers.js"></script>
     <script src="./app/views.js"></script>
@@ -148,7 +133,6 @@
         <!-- js inline - none -->
     [% END %]
     </script>
-
 
   </body>
 </html>
