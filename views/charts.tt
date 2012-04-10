@@ -39,34 +39,3 @@
     </div>
   </div>
 </div>
-
-
-[% BLOCK inline_js %]
-
-FApp.chartsController.load();
-
-//var loadChartsFunc = function(){ build_charts_table(); }
-//
-//var f = new Flowella({
-//    whenReady: loadChartsFunc 
-//});
-//
-//$('#newchartform').submit(function() {
-//    var chartname = $('[name=name]').val();
-//    f.builder.newChart( chartname, loadChartsFunc );
-//    return false;
-//});
-//
-//function build_charts_table() {
-//
-//    var html = "";
-//    for ( var chart_id in f.charts ) {
-//        html = html 
-//        + '<li><a href="/builder?chart=' + f.charts[chart_id].id 
-//        + '">' + f.charts[chart_id].name + '</a></li>'
-//    }
-//
-//    $("#chartsList").html( html );
-//}
-
-[% END %]
