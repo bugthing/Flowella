@@ -3,70 +3,40 @@ function build_section_edit_area() {
 
     var section = FApp.sectionController.get('section');
 
-    // get and fill section editing area.
-    //$.getJSON('/rest/build/section/' + section.section_id, function(sec) {
+    // fill the section edit div with html
+    $('#newform').html( 
+          '<div>'
+        +   '<div id="section_title"></div>'
+        +   '<div id="newformitems"></div>'
+        +   '<form>'
+        +     '<input type="Button" name="submit_section_line_forms" value="Save" class="btn large primary">'
+        +   '</form>'
+        + '</div>'
+    );
+    // hook up form submission..
+    var onsubmitSectionLines = function() {
+        submit_section_lines( section )
+    }
+    $('input[name="submit_section_line_forms"]').click( onsubmitSectionLines );
 
-        // fill the section edit div with html
-        $('#newform').html( 
-              '<div>'
-            +   '<div id="section_title"></div>'
-            +   '<div id="newformitems"></div>'
-            +   '<form>'
-            +     '<input type="Button" name="submit_section_line_forms" value="Save" class="btn large primary">'
-            +   '</form>'
-            + '</div>'
-        );
-        // hook up form submission..
-        var onsubmitSectionLines = function() {
-            submit_section_lines( section )
+    $('#newformitems').sortable();
+
+    draw_section_name( section.section_id, section.name );
+
+    // draw all the existing section lines
+    section.section_lines.forEach(function(secLineID) {
+        FApp.sectionController.loadSectionLine( secLineID.id );
+    });
+
+    // configure new area for dropping tools in
+    $("#sectionedit").droppable({
+        accept: '.charttool',
+        drop: function(event, ui) {
+            var tool_ref = ui.draggable.attr('id');
+            section.newSectionLine( tool_ref, whenLoadedFunc );
         }
-        $('input[name="submit_section_line_forms"]').click( onsubmitSectionLines );
+    });
 
-        $('#newformitems').sortable();
-
-        draw_section_name( section.section_id, section.name );
-
-        var whenLoadedFunc = function( sl ) { build_section_line_edit_area( sl ) };
-
-        // draw all the existing section lines
-        section.section_lines.forEach(function(secLineID) {
-            FApp.sectionController.loadSectionLine( secLineID.id );
-        });
-
-        //$.each(sec.section_lines, function(index, this_section_line) {
-        //    build_section_line_edit_area( this_section_line.id );
-        //});
-
-        // configure new area for dropping tools in
-        $("#sectionedit").droppable({
-            accept: '.charttool',
-            drop: function(event, ui) {
-                var tool_ref = ui.draggable.attr('id');
-    
-                section.newSectionLine( tool_ref, whenLoadedFunc );
-
-                //var new_section_line_json = {
-                //    section_id: section.section_id, 
-                //    tool_ref: tool_ref
-                //};
-
-                //section.newSectionLine
-
-                //// ..  call to create a new section line
-                //$.ajax({ 
-                //    url: '/rest/build/section_line',
-                //    type: "POST",
-                //    data: new_section_line_json,
-                //    dataType: "json",
-                //    success: function( section_lineJson ) { 
-
-                //        build_section_line_edit_area( section_line.id );
-                //    } 
-                //});
-            }
-        });
-
-    //});
 }
 
 function build_section_line_edit_area( section_line ) {
@@ -162,20 +132,26 @@ function edit_section_name( secID, secName ) {
  
 function submit_section_name() {
     
-    var secID   = $('#section_name_form :input[name=section_id]').val();
     var secName = $('#section_name_form :input[name=section_name]').val();
 
-    var section_data = {
-        name: secName
-    };
+    FApp.sectionController.updateName( secName );
 
-    // update the section..
-    update_section( secID, section_data, function( section ) { 
-        // .. then, draw section name in plain text..
-        draw_section_name( section.id, section.name );
-        // .. then, draw node again in chart..
-        draw_section_node( section.id, section.name );
-    });
+    var secID   = $('#section_name_form :input[name=section_id]').val();
+    draw_section_name( secID, secName );
+
+
+
+    //var section_data = {
+    //    name: secName
+    //};
+
+    //// update the section..
+    //update_section( secID, section_data, function( section ) { 
+    //    // .. then, draw section name in plain text..
+    //    draw_section_name( section.id, section.name );
+    //    // .. then, draw node again in chart..
+    //    draw_section_node( section.id, section.name );
+    //});
 
 }
 

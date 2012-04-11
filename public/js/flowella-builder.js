@@ -44,18 +44,19 @@ function build_chart_visual() {
        bindings: {
            'edit': function(t) {
                 var secID = parse_section_id( t.id );
-                FApp.chartController.editSection( secID );
+                FApp.chartController.showSectionEditor( secID );
            },
            'delete': function(t) {
                var secID = parse_section_id( t.id );
-               del_section( secID );
+               FApp.chartController.delSection( secID );
            },
            'onwardsection': function(t) {
                var secID = parse_section_id( t.id );
                dialog_for_onward_section( secID );
            },
            'newsection': function(t) {
-               add_section( chart );
+                var secID = parse_section_id( t.id );
+                FApp.chartController.addNewSection( secID );
            }
        }
    });
@@ -71,16 +72,27 @@ function enable_modals( chart ) {
     // .. bind and define the 'save' button function..
     $( "#onwardsection_save" ).unbind('click');
     $( "#onwardsection_save" ).bind('click', function() {
-            alert('new section');
-        chart.newOnwardSection(
-             $( "input:hidden[name=outward_section_id]" ).val(),
-             $( "input:text[name=button_label]" ).val(),
-             function( section ) {
-                $("#onwardsectionmodal").modal('hide');
-                build_chart_visual( section.chart );
-             }
-        );
+        var secId  = $( "input:hidden[name=outward_section_id]" ).val(); 
+        var butLab = $( "input:text[name=button_label]" ).val();
+        FApp.chartController.addOnwardSection( secId, butLab );
+        $("#onwardsectionmodal").modal('hide');
     });
+
+    // hookup the editsection modal
+    $( "#editsectionmodal" ).modal({ keyboard: true, backdrop: true });
+    $( "#editsectionmodal" ).modal( 'hide' );
+    // .. bind and define the 'save' button function..
+    $( "#editsection_save" ).unbind('click');
+    $( "#editsection_save" ).bind('click', function() {
+        var secId  = $( "input:hidden[name=outward_section_id]" ).val(); 
+        var butLab = $( "input:text[name=button_label]" ).val();
+        FApp.chartController.addOnwardSection( secId, butLab );
+        $("#editsectionmodal").modal('hide');
+    });
+
+
+
+
 }
 
 function drop_endpoint( dragged, dropped ) {

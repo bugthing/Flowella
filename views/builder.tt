@@ -153,14 +153,11 @@ textarea {
 <!-- jQuery newSectionDialog HTML --> 
 
     <div class="modal" id="onwardsectionmodal">
-
         <div class="modal-header">
             <a class="close" data-dismiss="modal">×</a>
             <h3>Onward Section</h3>
         </div>
-
         <div class="modal-body">
-
             <form class='form-stacked' id='onwardsection_form''>
                 <input type="hidden" name="outward_section_id" />
                 <fieldset>
@@ -168,15 +165,36 @@ textarea {
                     <input type="text" name="button_label" />
                 </fieldset>
             </form>
-
         </div>
-
         <div class="modal-footer">
             <a href="#" class="btn btn-primary" id='onwardsection_save'>Save changes</a>
         </div>
-
     </div>
 
+
+<!-- HandleBar JS Templates --> 
+<script type="text/x-handlebars" data-template-name="section-editor-modal">
+    <div class="modal" id="editsectionmodal">
+        <div class="modal-header">
+            <a class="close" {{ action "dismissModal" }}>×</a>
+            <h3>Edit Section</h3>
+        </div>
+        <div class="modal-body">
+            {{#each FApp.sectionLinesController}}
+              {{#view FApp.SectionLineEditView sectionLineBinding="this" idBinding="editId" classBinding="editClass"}}
+                {{ section_line_edit editSrc }}
+              {{/view}}
+            {{/each}}
+        </div>
+        <div class="modal-footer">
+
+            <a {{ action "saveSectionLines" }} href="#" class="btn btn-primary" id="editsection_save">
+                Save changes
+            </a>
+
+        </div>
+    </div>
+</script>
 
 
 [% BLOCK inline_js %]

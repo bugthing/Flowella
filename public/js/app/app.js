@@ -8,6 +8,9 @@ var FApp = Ember.Application.create({
     ready: function() {
         FApp.toolsController.load();
         FApp.chartsController.load();
+
+        // old skool way of enabling modals.. must replace..
+        enable_modals();
     },
 });
 
@@ -27,6 +30,10 @@ FApp.RESTModel = Ember.Object.extend({
     putREST: function() { 
         var data = this.serialize();
         return this._doREST( 'PUT', data );
+    },
+    postREST: function() { 
+        var data = this.serialize();
+        return this._doREST( 'POST', data );
     },
 
     _doREST: function( method, data ) {
@@ -50,20 +57,20 @@ FApp.RESTModel = Ember.Object.extend({
        }
     },
     serialize: function() {
-        var props = this.resourceProperties,
-            prop,
-            ret = {};
-
-        ret = {};
+        var props = this.resourceProperties;
+        var ret = {};
         for(var i = 0; i < props.length; i++) {
-          prop = props[i];
-          ret[prop] = this.get(prop);
+          var prop = props[i];
+          var val = this.get(prop);
+          if ( typeof(val) !== 'undefined' ) ret[prop] = val;
         }
         return ret;
     },
     _resourceUrl: function() {
-        var this_id = this.get('id');
-        return this.resourceUrl + '/' + this_id;
+        var thisId = this.get('id');
+        var urlPrefix = '';
+        if ( typeof(thisId) !== 'undefined' ) urlPrefix = '/' + thisId;
+        return this.resourceUrl + urlPrefix;
     }
 });
 
@@ -76,12 +83,12 @@ FApp.ChartModel = FApp.RESTModel.extend({
 
 FApp.SectionModel = FApp.RESTModel.extend({
     resourceUrl:  '/rest/build/section',
-    resourceProperties: ['name','pos_left','pos_top','display_html','section_lines'],
+    resourceProperties: ['name','chart_id','pos_left','pos_top','display_html','section_lines'],
 });
 
 FApp.SectionlineModel = FApp.RESTModel.extend({
     resourceUrl:  '/rest/build/section_line',
-    resourceProperties: ['section_id','edit_html'],
+    resourceProperties: ['section_id','edit_html','tool_ref'],
     // method that puts what you give it (data from 'edit_html' form)
     putFormData: function( data ) {
         return this._doREST( 'PUT', data );
@@ -121,6 +128,17 @@ FApp.toolsController = Ember.ArrayController.create({
         })
         .error(function() { alert('error getting tools'); });
     },
+    applyToolToSection: function(toolRef) {
+
+        // do some sort of "is there an active section edit" test
+        var sec = FApp.sectionController.get('section');
+        if ( typeof( sec ) === 'undefined' ) {
+            alert('No active section, cant add tool');
+            return;
+        }
+        // add to active sectionline to section (with only a tool ref)
+        FApp.sectionController.newSectionLine( toolRef );
+    }
 });
 
 FApp.chartsController = Ember.ArrayController.create({
@@ -161,8 +179,47 @@ FApp.chartController = Ember.Object.create({
         return this.get('chart').name;
     }.property('chart'),
 
-    editSection: function ( sectionID ) {
+    showSectionEditor: function ( sectionID ) {
         FApp.sectionController.set('section', FApp.SectionModel.create({ 'id': sectionID }) );
+    },
+    addNewSection: function ( baseSecID ) {
+        var chartId = this.get('chart').id;
+        var newSection = FApp.SectionModel.create({ 'chart_id': chartId });
+        newSection.postREST().success( function() {
+            FApp.sectionController.set('section', newSection);
+            FApp.chartController.loadVisualArea();
+        });
+    },
+    delSection: function( sectionId ) {
+        var sec = FApp.SectionModel.create({ 'id': sectionId });
+        sec.delREST().success( function() {
+            FApp.chartController.loadVisualArea();
+        });
+    },
+    addOnwardSection: function( fromSectionID, buttonLabel ) {
+
+        var data = {
+            buttons_next_counter: 1,
+            buttons_next_label_1: buttonLabel,
+            chart_id: this.get('chart').id,
+            outward_section_id: fromSectionID,
+            tool_ref: 'buttons_next'
+        };
+        var url = '/rest/build/onward_section';
+
+        return jQuery.ajax({
+          'url': url,
+          dataType: 'json',
+          type: 'POST',
+          'data': data
+        }).done( function(json) {
+            var newSectionID = json.id;
+            var newSection = FApp.SectionModel.create({ id: newSectionID });
+            newSection.getREST().success( function(){
+                FApp.sectionController.set('section', newSection);
+                FApp.chartController.loadVisualArea();
+            });
+        });
     },
 });
 
@@ -170,15 +227,57 @@ FApp.sectionController = Ember.Object.create({
     section:  Ember.required(),
     loadEditArea: function() {
         this.get('section').getREST().success( function(){
+
+            // New way! dd to SectionLines controller array 
+            var sec = FApp.sectionController.get('section');
+            var sectionLines = new Array();
+            for( var i=0; i < sec.section_lines.length; i++ ) {
+                var sl =  FApp.SectionlineModel.create({
+                    id: sec.section_lines[i].id,
+                    tool_ref: sec.section_lines[i].tool_ref,
+                    weight: sec.section_lines[i].weight
+                });
+                sectionLines.push(sl);
+            }
+            //FApp.sectionLinesController.set('content', sectionLines);
+
+            // old way to show edit area..
             build_section_edit_area();
+
         });
     }.observes('section'),
+
+    updateName: function( name ) {
+        var sec = this.get('section');
+        sec.set('name', name );
+        
+        // do rubbish hack so we only send 'name'..
+        var rp = sec.resourceProperties;
+        sec.resourceProperties = ['name'];
+
+        sec.putREST().success( function() {
+            FApp.chartController.loadVisualArea();
+        });
+    
+        sec.resourceProperties = rp; // put list back to put hack back
+    },
 
     loadSectionLine: function( sectionLineID ) {
 
         var sl = FApp.SectionlineModel.create({ 'id': sectionLineID });
         sl.getREST().success( function() {
             build_section_line_edit_area( sl );
+        });
+    },
+    newSectionLine: function( toolRef ) {
+
+        var secId = this.get('section').id;
+        var sl = FApp.SectionlineModel.create({ 
+            'section_id': secId,
+            'tool_ref': toolRef 
+        });
+        sl.postREST().success( function() {
+            FApp.sectionController.loadEditArea();
         });
     },
     delSectionLine: function( sectionLineID ) {
@@ -188,7 +287,6 @@ FApp.sectionController = Ember.Object.create({
             FApp.sectionController.loadEditArea();
         });
     },
-
     submitSectionLines: function() {
 
         var section_line_weight = 0;
@@ -231,6 +329,36 @@ FApp.sectionController = Ember.Object.create({
 
 });
 
+// ArrayBased controller to hold a list of section lines..
+FApp.sectionLinesController = Ember.ArrayController.create({
+    buildSectionLineEdits: function() {
+
+        this.get('content').forEach(function(secLine) {
+            secLine.getREST().success( function(){
+                //console.log('controller:' + secLine);
+                //FApp.editSectionLineView = FApp.SectionLineEditView.create({
+                //    'sectionLine' : secLine
+                //});
+                //FApp.editSectionLineView.appendTo('#section_editarea');
+            });
+        });
+ 
+        // display the editor view..       
+        FApp.SectionEditorView.create({
+        //    section: FApp.sectionController.get('section')
+        }).appendTo('body');
+
+    }.observes('content'),
+    updateSectionLines: function( sectionLinesUpdateData ) {
+        this.get('content').forEach(function(secLine) {
+            var updateData = sectionLinesUpdateData[ secLine.id ];
+            if ( typeof(updateData) !== 'undefined' ) secLine.putFormData( updateData );
+        });
+        // TODO - update chart/section and give response message 
+    }
+});
+
+
 /*- VIEWS ------------------------------------------------------------------*/
 
 FApp.ToolButtonView = Ember.View.extend({
@@ -240,11 +368,41 @@ FApp.ToolButtonView = Ember.View.extend({
     }.property('tool'),
     click: function(evt) {
         var toolRef = Ember.getPath(this, 'tool.ref');
-        var sec = FApp.sectionController.get('section');
-        if ( typeof( sec ) === 'undefined' ) {
-            alert('No active section, cant add tool');
-            return;
-        }
-        var sec = FApp.sectionModel;
+        FApp.toolsController.applyToolToSection( toolRef );
     }
 });
+
+FApp.SectionEditorView = Ember.View.extend({
+    templateName: 'section-editor-modal',
+    sectionLinesBinding: 'FApp.sectionLinesController',
+
+    dismissModal: function() {
+        alert('closing..');
+    },
+    saveSectionLines: function() {  
+        alert('saving..');
+    }
+});
+
+FApp.SectionLineEditView = Ember.View.extend({
+    templateName: 'show-editsectionline',
+    sectionLine: Ember.required(),
+    editClass: 'editsectionline',
+    editId: function() {
+        return 'editsectionline_' + this.get('sectionLine').id;
+    }.property('sectionLine'),
+    editSrc: function() {
+        return this.get('sectionLine').edit_html;
+    }.property('sectionLine'),
+});
+
+
+/*- HandleBars - helper ----------------------------------------------------*/
+// (crap way of html escaping)
+
+Handlebars.registerHelper('section_line_edit', function(property) {
+    var value = Ember.getPath(this, property);
+    if ( typeof(value) === 'undefined') value = '';
+    return new Handlebars.SafeString( value );
+});
+
