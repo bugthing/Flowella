@@ -23,28 +23,28 @@ function loadFlowella( chart_id ) {
 
 function build_tools_visual( f ) {
 
-    var items = [];
-    for( var t in f.builder.tools ) {
-        var tool = f.builder.tools[t];
-        items.push(
-            '<div class="ui-widget-content btn charttool" id="' + tool.ref + '">' + tool.name + '</div>'
-        );
-    }
-    $('#newtools').html( items.join('') );
-    $(".ui-widget-content").draggable({helper: 'clone'});
+    //var items = [];
+    //for( var t in f.builder.tools ) {
+    //    var tool = f.builder.tools[t];
+    //    items.push(
+    //        '<div class="ui-widget-content btn charttool" id="' + tool.ref + '">' + tool.name + '</div>'
+    //    );
+    //}
+    //$('#newtools').html( items.join('') );
+    //$(".ui-widget-content").draggable({helper: 'clone'});
 };
 
-function build_chart_visual( chart ) {
+function build_chart_visual() {
 
    // draw the whole chart
-   build_chart_plumbing( chart );
+   build_chart_plumbing();
 
    // link the section div(s) to context menu..
    $('div.sectionnode').contextMenu('sectionMenu', {
        bindings: {
            'edit': function(t) {
-               var secID = parse_section_id( t.id );
-               section = chart.loadSection( secID, function( s ){ build_section_edit_area( s ) } );
+                var secID = parse_section_id( t.id );
+                FApp.chartController.editSection( secID );
            },
            'delete': function(t) {
                var secID = parse_section_id( t.id );

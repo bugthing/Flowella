@@ -1,5 +1,7 @@
 
-function build_section_edit_area( section ) {
+function build_section_edit_area() {
+
+    var section = FApp.sectionController.get('section');
 
     // get and fill section editing area.
     //$.getJSON('/rest/build/section/' + section.section_id, function(sec) {
@@ -27,10 +29,9 @@ function build_section_edit_area( section ) {
         var whenLoadedFunc = function( sl ) { build_section_line_edit_area( sl ) };
 
         // draw all the existing section lines
-        for( i in section.section_lines ) {
-            var id = section.section_lines[i].id;
-            section.loadSectionLine( id, whenLoadedFunc );
-        }
+        section.section_lines.forEach(function(secLineID) {
+            FApp.sectionController.loadSectionLine( secLineID.id );
+        });
 
         //$.each(sec.section_lines, function(index, this_section_line) {
         //    build_section_line_edit_area( this_section_line.id );
@@ -70,11 +71,11 @@ function build_section_edit_area( section ) {
 
 function build_section_line_edit_area( section_line ) {
 
-    var anchor_id = 'section_line_' + section_line.section_line_id + '_anchor'
+    var anchor_id = 'section_line_' + section_line.id + '_anchor'
 
     $('#newformitems').append(
         '<div class="sectionlineedit form-stacked" id="edit_html_'
-        + section_line.section_line_id
+        + section_line.id
         + '">'
         + '<a class="close" id="' + anchor_id + '">×</a>'
         +   section_line.edit_html
@@ -85,47 +86,50 @@ function build_section_line_edit_area( section_line ) {
 
 function submit_section_lines ( section ) {
 
-    // find all forms within the div, serialize and do ajax call
-    var section_line_weight = 0;
-    $('#newformitems').find('.sectionlineedit').each( function( index, section_line_div ) { 
 
-        var myRegexp = /^edit_html_([0-9]+)$/;
-        var match = myRegexp.exec( section_line_div.id );
-        var section_line_id = match[1];
+    FApp.sectionController.submitSectionLines();
 
-        var section_line = section.loadSectionLine( section_line_id, function() {} );
+    //// find all forms within the div, serialize and do ajax call
+    //var section_line_weight = 0;
+    //$('#newformitems').find('.sectionlineedit').each( function( index, section_line_div ) { 
 
-        var section_line_form   = $(section_line_div).find('form');
-        var section_line_data   = $(section_line_form).serializeArray();
+    //    var myRegexp = /^edit_html_([0-9]+)$/;
+    //    var match = myRegexp.exec( section_line_div.id );
+    //    var section_line_id = match[1];
 
-        // add weight to the json ..
-        section_line_weight++;
-        section_line_data.push({
-            name: 'weight',
-            value: section_line_weight
-        });
-        section_line_data.weight = section_line_weight;
+    //    var section_line = section.loadSectionLine( section_line_id, function() {} );
 
+    //    var section_line_form   = $(section_line_div).find('form');
+    //    var section_line_data   = $(section_line_form).serializeArray();
 
-        draw_section_line( section_line )
-        
-        var whenUpdatedFunc = function( section_line ) {
+    //    // add weight to the json ..
+    //    section_line_weight++;
+    //    section_line_data.push({
+    //        name: 'weight',
+    //        value: section_line_weight
+    //    });
+    //    section_line_data.weight = section_line_weight;
 
-            if ( section_line.success == 1 ) {
-                $(section_line_div).attr('class', "alert-message success");
-                $(section_line_div).html( 'saved section_line:' + section_line.section_line_id);
-            }
-            else {
-                $(section_line_div).html( section_line.edit_html );
-            }
+    //    draw_section_line( section_line )
+    //    
+    //    var whenUpdatedFunc = function( section_line ) {
 
-        }
-        section_line.updateSectionLine( section_line_data, whenUpdatedFunc )
+    //        if ( section_line.success == 1 ) {
+    //            $(section_line_div).attr('class', "alert-message success");
+    //            $(section_line_div).html( 'saved section_line:' + section_line.section_line_id);
+    //        }
+    //        else {
+    //            $(section_line_div).html( section_line.edit_html );
+    //        }
 
-    });
+    //    }
+    //    section_line.updateSectionLine( section_line_data, whenUpdatedFunc )
+
+    //});
 
     // draw the chart again as has likely changed.
-    build_chart_visual( section.chart )
+    FApp.chartController.loadVisualArea();
+    //build_chart_visual( section.chart )
 
     // should be abit more clever about this and only add any new edges.. for now redraw whole chart! :(
     //build_section_edit_area( section );
@@ -137,11 +141,12 @@ function draw_section_line( section_line ) {
 
 function del_section_line( section_line ) {
 
-    var whenDeletedFunc = function( section_line ) { 
-        build_section_edit_area( section_line.section )
-    };
+    FApp.sectionController.delSectionLine( section_line.id );
 
-    section_line.deleteSectionLine( whenDeletedFunc );
+    //var whenDeletedFunc = function( section_line ) { 
+    //    build_section_edit_area( section_line.section )
+    //};
+    //section_line.deleteSectionLine( whenDeletedFunc );
 }
 
 function edit_section_name( secID, secName ) {

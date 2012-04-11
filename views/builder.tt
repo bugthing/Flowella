@@ -104,8 +104,18 @@ textarea {
 
     <div class="row-fluid">
       <div class="span12">
+
 <!-- Tools area --> 
-         <div id='newtools'></div>
+<script type="text/x-handlebars">
+    <div id='newtools'>
+    {{#each FApp.toolsController}}
+        {{#view FApp.ToolButtonView toolBinding="this" class="ui-widget-content btn charttool"}}
+            {{ tool.name }} 
+        {{/view}}
+    {{/each}}
+    </div>
+</script>
+
       </div>
     </div>
 
@@ -196,6 +206,15 @@ function read_chart_id() {
 // load flowella when jquery says we are ready
 var f;
 var chart_id = read_chart_id();
-$(document).ready( function() { loadFlowella ( chart_id ) } );
+
+$(document).ready( function() { 
+
+    // old way of drawing chart!.. TO BE REMOVED
+    //loadFlowella ( chart_id );
+
+    // load EmberJS based stuff..
+    FApp.chartController.set('chart', FApp.ChartModel.create({ 'id': chart_id }) );
+
+} );
 
 [% END %]

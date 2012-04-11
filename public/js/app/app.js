@@ -6,6 +6,7 @@
 
 var FApp = Ember.Application.create({
     ready: function() {
+        FApp.toolsController.load();
         FApp.chartsController.load();
     },
 });
@@ -113,13 +114,13 @@ FApp.toolsController = Ember.ArrayController.create({
                 FApp.toolsController.pushObject(
                     FApp.ToolModel.create({
                         ref: json[i].ref,
-                        name: json[i].name
+                        name: json[i].name,
                     })
                 );
             }
         })
         .error(function() { alert('error getting tools'); });
-    }
+    },
 });
 
 FApp.chartsController = Ember.ArrayController.create({
@@ -145,4 +146,105 @@ FApp.chartsController = Ember.ArrayController.create({
         })
         .error(function() { alert('error getting charts'); });
     },
+});
+
+FApp.chartController = Ember.Object.create({
+    chart: Ember.required(),
+    loadVisualArea: function() {
+        this.get('chart').getREST().success( function(){
+            // should now build chart
+            build_chart_visual()
+        });
+    }.observes('chart'),
+
+    title: function() {
+        return this.get('chart').name;
+    }.property('chart'),
+
+    editSection: function ( sectionID ) {
+        FApp.sectionController.set('section', FApp.SectionModel.create({ 'id': sectionID }) );
+    },
+});
+
+FApp.sectionController = Ember.Object.create({
+    section:  Ember.required(),
+    loadEditArea: function() {
+        this.get('section').getREST().success( function(){
+            build_section_edit_area();
+        });
+    }.observes('section'),
+
+    loadSectionLine: function( sectionLineID ) {
+
+        var sl = FApp.SectionlineModel.create({ 'id': sectionLineID });
+        sl.getREST().success( function() {
+            build_section_line_edit_area( sl );
+        });
+    },
+    delSectionLine: function( sectionLineID ) {
+
+        var sl = FApp.SectionlineModel.create({ 'id': sectionLineID });
+        sl.delREST().success( function() {
+            FApp.sectionController.loadEditArea();
+        });
+    },
+
+    submitSectionLines: function() {
+
+        var section_line_weight = 0;
+        var finalIndex = $('#newformitems').find('.sectionlineedit').length - 1;
+        $('#newformitems').find('.sectionlineedit').each( function( index, section_line_div ) {
+            var myRegexp = /^edit_html_([0-9]+)$/;
+            var match = myRegexp.exec( section_line_div.id );
+            var section_line_id = match[1];
+
+            var section_line_form   = $(section_line_div).find('form');
+            var section_line_data   = $(section_line_form).serializeArray();
+
+            // add weight to the json ..
+            section_line_weight++;
+            section_line_data.push({
+                name: 'weight',
+                value: section_line_weight
+            });
+
+            var sl = FApp.SectionlineModel.create({
+                'id': section_line_id,
+            });
+            sl.putFormData( section_line_data ).success( function( data ) {
+                if ( data.success == 1 ) {
+                    $(section_line_div).attr('class', "alert-message success");
+                    $(section_line_div).html( 'saved section_line:' + sl.get('id') );
+                } else {
+                    $(section_line_div).html( data.edit_html );
+                }
+
+                if ( index === finalIndex ) {
+                    // if last sectionline response, reload chart
+                    FApp.chartController.loadVisualArea();
+                }
+
+            });
+
+        });
+    },
+
+});
+
+/*- VIEWS ------------------------------------------------------------------*/
+
+FApp.ToolButtonView = Ember.View.extend({
+    tool:  Ember.required(),
+    id: function(){
+        return this.get('tool').ref;
+    }.property('tool'),
+    click: function(evt) {
+        var toolRef = Ember.getPath(this, 'tool.ref');
+        var sec = FApp.sectionController.get('section');
+        if ( typeof( sec ) === 'undefined' ) {
+            alert('No active section, cant add tool');
+            return;
+        }
+        var sec = FApp.sectionModel;
+    }
 });

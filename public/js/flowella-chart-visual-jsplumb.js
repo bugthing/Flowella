@@ -1,5 +1,7 @@
 
-function build_chart_plumbing( chart ) {
+function build_chart_plumbing() {
+
+    var chart = FApp.chartController.get('chart');
 
     var sections = chart.sections;
     var edges    = chart.edges;
