@@ -20,7 +20,7 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-chart">
-    <div id="chartvisual"> Chart: {{chart.title}} </div>
+    Chart: {{chart.title}} 
 </script>
 
 <script type="text/x-handlebars" data-template-name="list-chartsections">

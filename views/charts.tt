@@ -6,16 +6,16 @@
     <div class="hero-unit">
       <h1> Charts </h1>
       <div class="alert-message block-message info">
-
           <p> Existing charts are listed on the right, click one to start editing </p>
-
           <p> New charts can be created by filling in a name in the box below and clicking the 'Add Chart' button </p>
 
-          <form id='newchartform'>
-              Chart Name 
-              <input type='text' name='name'> 
-              <input type='submit' name='newchart' value='Add Chart'> 
-          </form>
+<script type="text/x-handlebars">
+   {{#view FApp.NewChartFormView tagName="form"}}
+     <label>New Chart: {{view Ember.TextField valueBinding="newchartname"}} </label>
+     {{#view Ember.Button target="parentView" action="submitNewChart"}}Create{{/view}}
+   {{/view}}
+</script>
+
       </div>
     </div>
   </div>
@@ -23,17 +23,19 @@
   <div class="span3">
     <div class="well sidebar-nav">
 
-
 <script type="text/x-handlebars">
     <ul class="nav nav-list" id='chartsList'>
     {{#each FApp.chartsController}}
-        <li>
-            <a {{bindAttr href="buildUrl"}}>{{ name }}</a>
-        </li>
+            {{#view FApp.ChartListView chartBinding="this" }}
+                <li>
+                <a {{ bindAttr href="buildUrl" }} >
+                    {{ chart.name }}
+                </a>
+                </li>
+            {{/view}}
     {{/each}}
     </ul>    
 </script>
-
 
       </ul>
     </div>

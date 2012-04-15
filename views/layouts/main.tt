@@ -112,11 +112,9 @@
     <script src="./js/flowella-section-edit.js"></script>
 
     <script src="./js/app/app.js"></script>
-    <!--
-    <script src="./app/models.js"></script>
-    <script src="./app/controllers.js"></script>
-    <script src="./app/views.js"></script>
-    -->
+    <script src="./js/app/models.js"></script>
+    <script src="./js/app/views.js"></script>
+    <script src="./js/app/controllers.js"></script>
 
     <!-- additional JS libs -->
     [% TRY %]

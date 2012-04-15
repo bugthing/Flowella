@@ -92,9 +92,7 @@ Flowella.ChartSectionView = Ember.View.extend({
 });
 
 Flowella.ChartEdgesView = Ember.View.extend({
-    templateName: 'list-chartedges',
     edgesBinding: 'Flowella.chartEdgesController',
-    drawCount: 0,
     didInsertElement: function() {
         this.drawEdges();
     },
