@@ -10,7 +10,7 @@ var FApp = Ember.Application.create({
         FApp.chartsController.load();
 
         // old skool way of enabling modals.. must replace..
-        enable_modals();
+        //enable_modals();
     },
 });
 

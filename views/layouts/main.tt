@@ -48,6 +48,13 @@
     [% END %]
     </style>
 
+    <!-- Head inline -->
+    [% TRY %]
+        [% INCLUDE inline_head %]
+    [% CATCH %]
+        <!-- head inline - none -->
+    [% END %]
+
   </head>
 
   <body>
@@ -106,9 +113,6 @@
 
     <!-- Flowella - Custom JS -->
 
-    <script src="./js/flowella.js"></script>
-    <script src="./js/flowella-builder.js"></script>
-    <script src="./js/flowella-chart-visual-jsplumb.js"></script>
     <script src="./js/flowella-section-edit.js"></script>
 
     <script src="./js/app/app.js"></script>

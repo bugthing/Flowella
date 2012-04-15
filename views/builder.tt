@@ -75,17 +75,6 @@ textarea {
     <div class="row-fluid">
       <div class="span12">
 
-<!-- Tools area --> 
-<script type="text/x-handlebars">
-    <div id='newtools'>
-    {{#each FApp.toolsController}}
-        {{#view FApp.ToolButtonView toolBinding="this" class="ui-widget-content btn charttool"}}
-            {{ tool.name }} 
-        {{/view}}
-    {{/each}}
-    </div>
-</script>
-
       </div>
     </div>
 
@@ -107,72 +96,6 @@ textarea {
       </div><!--/span-->
 
     </div><!--/row-->
-
-<!-- jQuery ContextMenu HTML --> 
-
-    <div class="contextMenu" id="sectionMenu">
-      <ul>
-        <li id="edit">          Edit           </li>
-        <li id="delete">        Delete         </li>
-        <li id="onwardsection"> Onward Section </li>
-        <li id="newsection">    New Section    </li>
-      </ul>
-    </div>
-
-<!-- onward section dialog HTML --> 
-
-    <div class="modal" id="onwardsectionmodal">
-        <div class="modal-header">
-            <a class="close" data-dismiss="modal">×</a>
-            <h3>Onward Section</h3>
-        </div>
-        <div class="modal-body">
-            <form class='form-stacked' id='onwardsection_form''>
-                <input type="hidden" name="outward_section_id" />
-                <fieldset>
-                    <label for="onwardsection_text">Button Label</label>
-                    <input type="text" name="button_label" />
-                </fieldset>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <a href="#" class="btn btn-primary" id='onwardsection_save'>Save changes</a>
-        </div>
-    </div>
-
-
-<!-- HandleBar JS Templates --> 
-<script type="text/x-handlebars" data-template-name="section-editor-modal">
-    <div class="modal" id="editsectionmodal">
-        <div class="modal-header">
-            <a class="close" {{ action "dismissModal" }}>×</a>
-            <h3>Edit Section</h3>
-        </div>
-        <div class="modal-body">
-            {{#each FApp.sectionLinesController}}
-              {{#view FApp.SectionLineEditView sectionLineBinding="this" idBinding="editId" classBinding="editClass"}}
-                {{ section_line_edit editSrc }}
-              {{/view}}
-            {{/each}}
-        </div>
-        <div class="modal-footer">
-            <a {{ action "saveSectionLines" }} href="#" class="btn btn-primary" id="editsection_save">
-                Save changes
-            </a>
-        </div>
-    </div>
-</script>
-
-<script type="text/x-handlebars" data-template-name="show-chart">
-    {{ chart.title }}
-    {{#each chart.sections}}
-        {{#view FApp.ChartSectionView sectionBinding="this"}}
-            <div {{bindAttr id="secId"}} class="sectionnode btn">
-                {{ section.name }}
-            </div>
-        {{/view}}
-    {{/each}}
-</script>
 
 [% BLOCK inline_js %]
 
@@ -206,5 +129,82 @@ $(document).ready( function() {
     // load EmberJS based stuff..
     FApp.chartController.set('chart', FApp.ChartModel.create({ 'id': chart_id }) );
 } );
+
+[% END %]
+
+[% BLOCK inline_head %]
+<!-- EmberJS - view handlebar templates -->
+
+<script type="text/x-handlebars" data-template-name="list-tools">
+    <div id="toolsvisual">
+        {{#each tools}}
+            {{#view FApp.ToolButtonView toolBinding="this" }}
+                <div class="ui-widget-content btn charttool" id="{{tool.ref}}">{{tool.name}}</div>
+            {{/view}}   
+        {{/each}}   
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-chart">
+    Chart: {{chart.title}} 
+    {{#each FApp.chartSectionsController}}
+        {{#view FApp.ChartSectionView sectionBinding="this"}}
+            <div class="sectionnode" {{bindAttr id="secId"}} {{bindAttr style="divStyle"}} > 
+                {{name}}
+            </div>
+        {{/view}}
+    {{/each}}   
+    {{#view FApp.ChartEdgesView }}
+        {{ label }}
+    {{/view}}   
+    <div class="contextMenu" id="sectionMenu" style='display:none;'>
+      <ul>
+        <li id="edit">          Edit           </li>
+        <li id="delete">        Delete         </li>
+        <li id="onwardsection"> Onward Section </li>
+        <li id="newsection">    New Section    </li>
+      </ul>
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-chartsectiononward">
+    <div class="modal" id="onwardsectionmodal">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">x</a>
+            <h3>OnwardSection</h3>
+        </div>
+        <div class="modal-body">
+            <form class='form-stacked' id='onwardsection_form'>
+                <input type="hidden" name="outward_section_id"/>
+                <fieldset>
+                    <label for="onwardsection_text">Button Label</label>
+                    <input type="text"name="button_label" />
+                </fieldset>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btnbtn-primary" {{ action "clickSave" }}>
+                Save changes
+            </a>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-sectionedit">
+    <div>
+        <div>Section: {{section.section.name}}</div>
+        <div id="section_editarea">
+        </div>
+        <div>
+            <a href='#' class='btn' {{action "saveSectionLines"}}> SAVE </a>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-editsectionline">
+    <div {{bindAttr id="editId" }} {{bindAttr class="editClass"}}>
+        {{ section_line_edit editSrc }}
+    </div>
+</script>
 
 [% END %]
