@@ -74,7 +74,7 @@ FApp.chartController = Ember.Object.create({
             var sections = new Array();
             for( var i=0; i < chart.sections.length; i++ ) {
                 sections.push(
-                    Ember.Object.create({
+                    FApp.SectionModel.create({
                         id: chart.sections[i].id,
                         name: chart.sections[i].name,
                         pos_left: chart.sections[i].pos_left,
@@ -118,7 +118,13 @@ FApp.chartController = Ember.Object.create({
 
 
     showSectionEditor: function ( sectionID ) {
-        FApp.sectionController.set('section', FApp.SectionModel.create({ 'id': sectionID }) );
+
+        // find the section from the loaded list and set it
+        FApp.chartSectionsController.get('content').forEach(function(sec) {
+            if ( sec.id === sectionID ) {
+                FApp.sectionController.set('section', sec );
+            }
+        });
     },
     addNewSection: function ( baseSecID ) {
         var chartId = this.get('chart').id;
@@ -131,6 +137,7 @@ FApp.chartController = Ember.Object.create({
     delSection: function( sectionId ) {
         var sec = FApp.SectionModel.create({ 'id': sectionId });
         sec.delREST().success( function() {
+            // should delete from this.sections AND FApp.chartSectionsController!
             FApp.chartController.loadVisualArea();
         });
     },

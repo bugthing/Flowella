@@ -58,7 +58,6 @@ function build_section_line_edit_area( section_line ) {
 
 function submit_section_lines ( section ) {
     FApp.sectionController.submitSectionLines();
-    FApp.chartController.loadVisualArea();
 }
 
 function del_section_line( section_line ) {
@@ -79,7 +78,6 @@ function submit_section_name() {
     FApp.sectionController.updateName( secName );
     var secID   = $('#section_name_form :input[name=section_id]').val();
     draw_section_name( secID, secName );
-    FApp.chartController.loadVisualArea();
 }
 
 function draw_section_name(secID, secName) {
