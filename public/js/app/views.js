@@ -48,6 +48,28 @@ FApp.ToolButtonView = Ember.View.extend({
 
 
 /*--- section editor ------------------------------------------------------*/
+FApp.SectionEditModalView = Ember.View.extend({
+    templateName: 'show-sectioneditmodal',
+    didInsertElement: function() {
+        // hookup the sectionedit modal
+        $( "#sectioneditmodal" ).modal({ keyboard: true, backdrop: true });
+        $( "#sectioneditmodal" ).modal( 'show' );
+        // display in the old way (see flowella-section-edit.js)
+        build_section_edit_area();
+    },
+    clickSave: function() {
+        alert('save');
+        //// .. bind and define the 'save' button function..
+        //$( "#section_save" ).bind('click', function() {
+        //        var secId  = $( "input:hidden[name=outward_section_id]" ).val(); 
+        //        var butLab = $( "input:text[name=button_label]" ).val();
+        //        FApp.chartController.addOnwardSection( secId, butLab );
+        //        $("#onwardsectionmodal").modal('hide');
+        //    });
+
+    },
+});
+
 FApp.EditSectionView = Ember.View.extend({
     templateName: 'show-sectionedit',
     section_linesBinding: 'FApp.chartSectionLinesController',

@@ -73,28 +73,11 @@ textarea {
 [% END %]
 
     <div class="row-fluid">
-      <div class="span12">
-
-      </div>
-    </div>
-
-    <div class="row-fluid">
-
-      <div class="span9">
         <div class="well" id="mainarea">
 <!-- Chart area --> 
             <!-- tempory refresh link --> 
             <div><a href='javascript: build_chart_plumbing();'>refresh</a> </div>
         </div>
-      </div>
-
-      <div class="span3">
-<!-- Section edit area --> 
-        <div class="well sidebar-nav" id="sectionedit"> 
-          <div id='newform'></div>
-        </div>
-      </div><!--/span-->
-
     </div><!--/row-->
 
 [% BLOCK inline_js %]
@@ -165,6 +148,7 @@ $(document).ready( function() {
         <li id="newsection">    New Section    </li>
       </ul>
     </div>
+    <div id="sectioneditmodalcontainer"></div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-chartsectiononward">
@@ -186,6 +170,25 @@ $(document).ready( function() {
             <a href="#" class="btnbtn-primary" {{ action "clickSave" }}>
                 Save changes
             </a>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="show-sectioneditmodal">
+    <div class="modal" id="sectioneditmodal">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">x</a>
+            <h3>Section Editor</h3>
+        </div>
+        <div class="modal-body">
+          <div id='newform'></div>
+        </div>
+        <div class="modal-footer">
+
+            <div id="toolsvisual">
+                {{view FApp.ToolsView}}   
+            </div>
+
         </div>
     </div>
 </script>

@@ -99,10 +99,8 @@ FApp.chartController = Ember.Object.create({
 
             // show view?
             if ( typeof(FApp.chartContainerView) == 'undefined' ) {
-                FApp.toolsView = FApp.ToolsView.create();
-                FApp.toolsView.replaceIn('#mainarea');
                 FApp.chartView = FApp.ChartView.create();
-                FApp.chartView.appendTo('#mainarea');
+                FApp.chartView.replaceIn('#mainarea');
             }
 
         });
@@ -182,21 +180,9 @@ FApp.sectionController = Ember.Object.create({
     loadEditArea: function() {
         this.get('section').getREST().success( function(){
 
-            // New way! dd to SectionLines controller array 
-            var sec = FApp.sectionController.get('section');
-            var sectionLines = new Array();
-            for( var i=0; i < sec.section_lines.length; i++ ) {
-                var sl =  FApp.SectionlineModel.create({
-                    id: sec.section_lines[i].id,
-                    tool_ref: sec.section_lines[i].tool_ref,
-                    weight: sec.section_lines[i].weight
-                });
-                sectionLines.push(sl);
-            }
-            //.FApp.sectionLinesController.set('content', sectionLines);
-
-            // old way to show edit area..
-            build_section_edit_area();
+            // show edit popup
+            var view = FApp.SectionEditModalView.create({});
+            view.replaceIn('#sectioneditmodalcontainer');
 
         });
     }.observes('section'),
@@ -281,7 +267,7 @@ FApp.sectionLinesController = Ember.ArrayController.create({
         FApp.EditSectionView.create({}).replaceIn('#newform');
         // add content to edit area
         this.get('content').forEach(function(secLine) {
-        secLine.getREST().success( function(){
+            secLine.getREST().success( function(){
                 console.log('controller:' + secLine);
                 FApp.editSectionLineView = FApp.SectionLineEditView.create({
                     'sectionLine' : secLine
