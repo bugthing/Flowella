@@ -118,19 +118,19 @@ FApp.chartController = Ember.Object.create({
 
 
     showSectionEditor: function ( sectionID ) {
-
         // find the section from the loaded list and set it
+        var loadThisSection;
         FApp.chartSectionsController.get('content').forEach(function(sec) {
-            if ( sec.id === sectionID ) {
-                FApp.sectionController.set('section', sec );
-            }
+            if( sec.id == sectionID ) loadThisSection = sec;
         });
+        FApp.sectionController.set('section', loadThisSection );
     },
     addNewSection: function ( baseSecID ) {
+        // create a section model, make rest call and add to list..
         var chartId = this.get('chart').id;
         var newSection = FApp.SectionModel.create({ 'chart_id': chartId });
         newSection.postREST().success( function() {
-            FApp.sectionController.set('section', newSection);
+            //FApp.sectionController.set('section', newSection);
             FApp.chartSectionsController.pushObject(newSection);
         });
     },
@@ -186,11 +186,8 @@ FApp.sectionController = Ember.Object.create({
     section:  Ember.required(),
     loadEditArea: function() {
         this.get('section').getREST().success( function(){
-
             // show edit popup
-            var view = FApp.SectionEditModalView.create({});
-            view.replaceIn('#sectioneditmodalcontainer');
-
+            FApp.SectionEditModalView.create({}).replaceIn('#sectioneditmodalcontainer');
         });
     }.observes('section'),
 

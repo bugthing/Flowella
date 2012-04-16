@@ -175,20 +175,22 @@ $(document).ready( function() {
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-sectioneditmodal">
-    <div class="modal" id="sectioneditmodal">
+    <div class="modal">
         <div class="modal-header">
-            <a class="close" {{ action "destroyElement" }}>x</a>
+            <a class="close" data-dismiss="modal">x</a>
             <h3>Section Editor</h3>
         </div>
-        <div class="modal-body">
-          <div id='newform'></div>
-        </div>
-        <div class="modal-footer">
-
+        <div class="modal-header">
             <div id="toolsvisual">
                 {{view FApp.ToolsView}}   
             </div>
-
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btnbtn-primary" {{ action "clickSave" }}>
+                Save changes
+            </a>
         </div>
     </div>
 </script>

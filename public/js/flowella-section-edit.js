@@ -10,9 +10,6 @@ function build_section_edit_area() {
           '<div>'
         +   '<div id="section_title"></div>'
         +   '<div id="newformitems"></div>'
-        +   '<form>'
-        +     '<input type="Button" name="submit_section_line_forms" value="Save" class="btn large primary">'
-        +   '</form>'
         + '</div>'
     );
     // hook up form submission..
@@ -56,13 +53,10 @@ function build_section_line_edit_area( section_line ) {
     $('a#' + anchor_id ).click( function() { del_section_line( section_line ) } );
 }
 
-function submit_section_lines ( section ) {
-    FApp.sectionController.submitSectionLines();
-}
-
 function del_section_line( section_line ) {
     FApp.sectionController.delSectionLine( section_line.id );
 }
+
 function edit_section_name( secID, secName ) {
     $('#section_title').empty();
     $('#section_title').html(
