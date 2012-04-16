@@ -36,6 +36,7 @@ FApp.ToolsView = Ember.View.extend({
 
 FApp.ToolButtonView = Ember.View.extend({
     tool:  Ember.required(),
+    classNames: ['ui-widget-content','btn','charttool'],
     id: function(){
         return this.get('tool').ref;
     }.property('tool'),

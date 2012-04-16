@@ -139,17 +139,17 @@ $(document).ready( function() {
     <div id="toolsvisual">
         {{#each tools}}
             {{#view FApp.ToolButtonView toolBinding="this" }}
-                <div class="ui-widget-content btn charttool" id="{{tool.ref}}">{{tool.name}}</div>
+                {{tool.name}}
             {{/view}}   
         {{/each}}   
     </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-chart">
-    Chart: {{chart.title}} 
+    <h3>Chart: {{chart.title}} </h3>
     {{#each FApp.chartSectionsController}}
         {{#view FApp.ChartSectionView sectionBinding="this"}}
-            <div class="sectionnode" {{bindAttr id="secId"}} {{bindAttr style="divStyle"}} > 
+            <div class="sectionnode btn" {{bindAttr id="secId"}} {{bindAttr style="divStyle"}} > 
                 {{name}}
             </div>
         {{/view}}
