@@ -127,7 +127,7 @@ FApp.chartController = Ember.Object.create({
         var newSection = FApp.SectionModel.create({ 'chart_id': chartId });
         newSection.postREST().success( function() {
             FApp.sectionController.set('section', newSection);
-            FApp.chartController.loadVisualArea();
+            FApp.chartSectionsController.pushObject(newSection);
         });
     },
     delSection: function( sectionId ) {
@@ -209,9 +209,7 @@ FApp.sectionController = Ember.Object.create({
         var rp = sec.resourceProperties;
         sec.resourceProperties = ['name'];
 
-        sec.putREST().success( function() {
-            FApp.chartController.loadVisualArea();
-        });
+        sec.putREST().success( function() { });
     
         sec.resourceProperties = rp; // put list back to put hack back
     },
@@ -270,14 +268,7 @@ FApp.sectionController = Ember.Object.create({
                 } else {
                     $(section_line_div).html( data.edit_html );
                 }
-
-                if ( index === finalIndex ) {
-                    // if last sectionline response, reload chart
-                    FApp.chartController.loadVisualArea();
-                }
-
             });
-
         });
     },
 
