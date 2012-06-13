@@ -59,6 +59,20 @@ FApp.chartsController = Ember.ArrayController.create({
 });
 
 FApp.chartSectionsController = Ember.ArrayController.create({
+
+    // helper method that looks up index in .content
+    getIndexFromSectionId: function( secID ) {
+            var idx = null;
+            this.get('content').forEach(function(sec, i) {
+                if ( secID == sec.get('id') ) idx = i;
+            });
+            return idx;
+    },
+    // helper method that looks up object in .content
+    getSectionFromSectionId: function( secID ) {
+        var idx = this.getIndexFromSectionId( secID );
+        return this.get('content')[idx];
+    }
 });
 FApp.chartEdgesController = Ember.ArrayController.create({
 });
@@ -106,24 +120,19 @@ FApp.chartController = Ember.Object.create({
         });
     }.observes('chart'),
 
-    title: function() {
-        return this.get('chart').name;
-    }.property('chart'),
-    sections: function() {
-        return this.get('chart').sections;
-    }.property('chart'),
-    edges: function() {
-        return this.get('chart').edges;
-    }.property('chart'),
+    //title: function() {
+    //    return this.get('chart').name;
+    //}.property('chart'),
+    //sections: function() {
+    //    return this.get('chart').sections;
+    //}.property('chart'),
+    //edges: function() {
+    //    return this.get('chart').edges;
+    //}.property('chart'),
 
 
-    showSectionEditor: function ( sectionID ) {
-        // find the section from the loaded list and set it
-        var loadThisSection;
-        FApp.chartSectionsController.get('content').forEach(function(sec) {
-            if( sec.id == sectionID ) loadThisSection = sec;
-        });
-        FApp.sectionController.set('section', loadThisSection );
+    showSectionEditor: function ( section ) {
+        FApp.sectionController.set('section', section );
     },
     addNewSection: function ( baseSecID ) {
         // create a section model, make rest call and add to list..
@@ -134,11 +143,15 @@ FApp.chartController = Ember.Object.create({
             FApp.chartSectionsController.pushObject(newSection);
         });
     },
-    delSection: function( sectionId ) {
-        var sec = FApp.SectionModel.create({ 'id': sectionId });
-        sec.delREST().success( function() {
-            // should delete from this.sections AND FApp.chartSectionsController!
-            FApp.chartController.loadVisualArea();
+    delSection: function( section ) {
+
+        section.delREST().success( function() {
+
+            var removeIdx = FApp.chartSectionsController.getIndexFromSectionId( section.id );
+            if ( removeIdx >= 0 ) {
+                FApp.chartSectionsController.removeAt(removeIdx);
+            }
+
         });
     },
     addOnwardSection: function( fromSectionID, buttonLabel ) {
@@ -167,17 +180,12 @@ FApp.chartController = Ember.Object.create({
         });
     },
     dropSection: function( sectionID, posLeft, posTop ) {
-        // build section object.
-        var droppedSection = FApp.SectionModel.create({'id': sectionID});
-        // set the new left and top possition..
+
+        // get dropped section and set the new left and top possition then save..
+        var droppedSection = FApp.chartSectionsController.getSectionFromSectionId( sectionID );
         droppedSection.set('pos_left', posLeft);
         droppedSection.set('pos_top', posTop);
-
-        // this is a massive hack so it only puts the pos_left/top data
-        var old_list = droppedSection.get('resourceProperties');
-        droppedSection.set('resourceProperties', ['pos_left','pos_top']);
         droppedSection.putREST();
-        droppedSection.set('resourceProperties', old_list);
         
     }
 });

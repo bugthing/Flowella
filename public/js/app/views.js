@@ -62,7 +62,7 @@ FApp.SectionEditModalView = Ember.View.extend({
         build_section_edit_area();
     },
     unshow: function() {
-        $( ".modal" ).modal( 'hide' );
+        $( ".modal" ).modal( 'close' );
         this.destroyElement();
     },
     clickSave: function() {
@@ -145,7 +145,7 @@ Handlebars.registerHelper('section_line_edit', function(property) {
 
 FApp.ChartView = Ember.View.extend({
     templateName: 'show-chart',
-    chartBinding: 'FApp.chartController',
+    chartBinding: 'FApp.chartController.chart',
 });
 
 FApp.ChartSectionView = Ember.View.extend({
@@ -162,6 +162,20 @@ FApp.ChartSectionView = Ember.View.extend({
         return 'section_' + this.get('section').id;
     }.property('section'),
     didInsertElement: function() {
+        var selector = '#' + 'section_' + this.get('section').id;
+        jsPlumb.draggable(jsPlumb.getSelector(selector), {
+            stop: function(e, ui) {
+                var dragged = ui.helper;
+                if ( ! dragged ) return ;
+                var matched = dragged.attr('id').match( /^section_([0-9]+)/ );
+                if ( matched.length > 1 ) {
+                    var sectionID = matched[1];
+                    var pos = dragged.position();
+                    FApp.chartController.dropSection( sectionID, pos.left, pos.top );
+                }
+            }
+        });
+        // right click menu
         this.linkContextMenu();
     },
     linkContextMenu: function() {
@@ -174,10 +188,10 @@ FApp.ChartSectionView = Ember.View.extend({
             shadow: true,
             bindings: {
                 'edit': function(t) {
-                     FApp.chartController.showSectionEditor( secID );
+                     FApp.chartController.showSectionEditor( sec );
                 },
                 'delete': function(t) {
-                    FApp.chartController.delSection( secID );
+                    FApp.chartController.delSection( sec );
                 },
                 'onwardsection': function(t) {
                     //oldway// dialog_for_onward_section( secID );
@@ -208,24 +222,6 @@ FApp.ChartEdgesView = Ember.View.extend({
         var edges = this.get('edges').content;
 
         jsPlumb.Defaults.Connector = [ "Flowchart" ];
-        jsPlumb.Defaults.DropOptions = {
-            tolerance:"touch",
-            drop: function(e, ui) {
-                var dragged = ui.draggable;
-                var matched = dragged.attr('id').match( /^section_([0-9]+)/ );
-                if ( matched.length > 1 ) {
-                    var sectionID = matched[1];
-                    var pos = dragged.position();
-                    FApp.chartController.dropSection( sectionID, pos.left, pos.top );
-                }
-            }
-        };
-        jsPlumb.makeTarget(
-            'chartvisual',
-            {
-                isTarget: true,
-            }
-        );
 
         var connectorPaintStyle = { lineWidth:3, strokeStyle: "#346789" };
 
@@ -267,8 +263,6 @@ FApp.ChartEdgesView = Ember.View.extend({
             var connection = jsPlumb.connect({ source: source_ep, target: target_ep, overlays:overlays});
         }
 
-        // make all .window divs draggable
-        jsPlumb.draggable(jsPlumb.getSelector(".sectionnode"));
     },
 });
 

@@ -72,13 +72,11 @@ textarea {
 
 [% END %]
 
-    <div class="row-fluid">
-        <div class="well" id="mainarea">
-<!-- Chart area --> 
-            <!-- tempory refresh link --> 
-            <div><a href='javascript: build_chart_plumbing();'>refresh</a> </div>
-        </div>
-    </div><!--/row-->
+<div class="row-fluid">
+    <div class="well" id="mainarea">
+        <!-- Chart area --> 
+    </div>
+</div>
 
 [% BLOCK inline_js %]
 
@@ -109,8 +107,13 @@ var f;
 var chart_id = read_chart_id();
 
 $(document).ready( function() { 
+
     // load EmberJS based stuff..
-    FApp.chartController.set('chart', FApp.ChartModel.create({ 'id': chart_id }) );
+    var chart =  FApp.ChartModel.create({ 'id': chart_id });
+    chart.getREST().success( function() {
+        FApp.chartController.set('chart', chart );
+    });
+
 } );
 
 [% END %]
@@ -129,7 +132,7 @@ $(document).ready( function() {
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-chart">
-    <h3>Chart: {{chart.title}} </h3>
+    <h3>Chart: {{chart.name}} </h3>
     {{#each FApp.chartSectionsController}}
         {{#view FApp.ChartSectionView sectionBinding="this"}}
             <div class="sectionnode btn" {{bindAttr id="secId"}} {{bindAttr style="divStyle"}} > 
