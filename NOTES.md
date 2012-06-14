@@ -51,6 +51,9 @@ Use Interface:
   CSS - Layout: 
       http://twitter.github.com/bootstrap/
 
+  JS MVC Framwork
+      http://docs.emberjs.com
+
   JS Framework:
       http://jquery.com/
 
@@ -84,3 +87,34 @@ Useful Commands
 
 * Install (via cpanm) perl modules
   for cp in `dzil listdeps`; do cpanm $cp; done
+
+Get EmberJS, Complile and integrate EmberJS
+--------------------------------------------
+
+git submodule add git://github.com/emberjs/ember.js.git ./submodules/ember.js
+cd ./submodules/ember.js/
+bundle install
+rake
+cd ../../
+mkdir public/css/bootstrap
+mkdir public/js/bootstrap
+mkdir public/js/emberjs
+cp submodules/bootstrap/docs/assets/css/bootstrap.css ./public/css/bootstrap/bootstrap.css
+cp submodules/bootstrap/docs/assets/css/bootstrap-responsive.css ./public/css/bootstrap/bootstrap-responsive.css
+cp submodules/ember.js/dist/ember.js ./public/js/emberjs/ember.js
+for FILE in \
+    bootstrap-transition.js   \
+    bootstrap-alert.js        \
+    bootstrap-modal.js        \
+    bootstrap-dropdown.js     \
+    bootstrap-scrollspy.js    \
+    bootstrap-tab.js          \
+    bootstrap-tooltip.js      \
+    bootstrap-popover.js      \
+    bootstrap-button.js       \
+    bootstrap-collapse.js     \
+    bootstrap-carousel.js     \
+    bootstrap-typeahead.js    
+do
+    cp submodules/bootstrap/js/$FILE ./public/js/bootstrap/$FILE
+done
