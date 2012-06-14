@@ -22,7 +22,13 @@ FApp.toolsController = Ember.ArrayController.create({
         })
         .error(function() { alert('error getting tools'); });
     },
-    applyToolToSection: function(toolRef) {
+    applyToolToSection: function() {
+
+        var toolRef = this.get('selectedTool').ref;
+        if ( ! toolRef ) {
+            alert('No tool selected');
+            return;
+        }
 
         // do some sort of "is there an active section edit" test
         var sec = FApp.sectionController.get('section');
@@ -32,7 +38,8 @@ FApp.toolsController = Ember.ArrayController.create({
         }
         // add to active sectionline to section (with only a tool ref)
         FApp.sectionController.newSectionLine( toolRef );
-    }
+    },
+    selectedTool: null
 });
 
 FApp.chartsController = Ember.ArrayController.create({
@@ -195,7 +202,7 @@ FApp.sectionController = Ember.Object.create({
     loadEditArea: function() {
         this.get('section').getREST().success( function(){
             // show edit popup
-            FApp.SectionEditModalView.create({}).replaceIn('#sectioneditmodalcontainer');
+            FApp.SectionEditModalView.create({}).replaceIn('#modalcontainer');
         });
     }.observes('section'),
 

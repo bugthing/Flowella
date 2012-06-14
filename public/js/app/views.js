@@ -31,21 +31,13 @@ FApp.NewChartFormView = Ember.View.extend({
 /*--- tools ------------------------------------------------------------*/
 FApp.ToolsView = Ember.View.extend({
     templateName: 'list-tools',
-    toolsBinding: 'FApp.toolsController',
 });
-
-FApp.ToolButtonView = Ember.View.extend({
-    tool:  Ember.required(),
-    classNames: ['ui-widget-content','btn','charttool'],
-    id: function(){
-        return this.get('tool').ref;
-    }.property('tool'),
-    click: function(evt) {
-        var toolRef = Ember.getPath(this, 'tool.ref');
-        FApp.toolsController.applyToolToSection( toolRef );
-    }
+FApp.ToolsSelectView = Ember.Select.extend({
+    contentBinding: 'FApp.toolsController',
+    optionLabelPath: 'content.name',
+    optionValuePath: 'content.ref',
+    selectionBinding: "FApp.toolsController.selectedTool"
 });
-
 
 /*--- section editor ------------------------------------------------------*/
 FApp.SectionEditModalView = Ember.View.extend({
@@ -199,7 +191,7 @@ FApp.ChartSectionView = Ember.View.extend({
                     var view = FApp.OnwardSectionModalView.create({
                         fromSectionID: secID,
                     });
-                    view.appendTo('#mainarea');
+                    view.replaceIn('#modalcontainer');
 
                 },
                 'newsection': function(t) {

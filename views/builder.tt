@@ -78,6 +78,7 @@ textarea {
     </div>
 </div>
 
+
 [% BLOCK inline_js %]
 
 function read_chart_id() {
@@ -123,11 +124,8 @@ $(document).ready( function() {
 
 <script type="text/x-handlebars" data-template-name="list-tools">
     <div id="toolsvisual">
-        {{#each tools}}
-            {{#view FApp.ToolButtonView toolBinding="this" }}
-                {{tool.name}}
-            {{/view}}   
-        {{/each}}   
+        {{view FApp.ToolsSelectView }}
+        {{#view Ember.Button target="FApp.toolsController" action="applyToolToSection" }} Add Tool {{/view}}
     </div>
 </script>
 
@@ -151,7 +149,7 @@ $(document).ready( function() {
         <li id="newsection">    New Section    </li>
       </ul>
     </div>
-    <div id="sectioneditmodalcontainer"></div>
+    <div id="modalcontainer"></div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="show-chartsectiononward">
